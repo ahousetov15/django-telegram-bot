@@ -1,66 +1,89 @@
-FROM python:3.12.0a7-bullseye AS builder
+# FROM python:3.12.0a7-bullseye AS builder
 
-ENV PYTHONUNBUFFERED=1
-ARG WORKDIR=/code
+# ENV PYTHONUNBUFFERED=1
+# ARG WORKDIR=/code
 
-ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    PIP_NO_CACHE_DIR=1 \
-    # Turns off buffering for easier container logging
-    PYTHONUNBUFFERED=1 \
-    # Keeps Python from generating .pyc files in the container
-    PYTHONDONTWRITEBYTECODE=1 \
-    # make poetry install to this location
-    POETRY_HOME="/opt/poetry" \
-    # make poetry create the virtual environment in the project's root
-    # it gets named `.venv`
-    POETRY_VIRTUALENVS_CREATE=1 \
-    POETRY_VIRTUALENVS_IN_PROJECT=1 \
-    # do not ask any interactive question
-    # POETRY_NO_INTERACTION=1 \
-    # PYPI_HOST="rt-bus-nxs-p1.trcont.ru/repository/esb-pypi-proxy/simple/" \
-    POETRY_VERSION=1.3.2
+# ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
+#     PIP_NO_CACHE_DIR=1 \
+#     # Turns off buffering for easier container logging
+#     PYTHONUNBUFFERED=1 \
+#     # Keeps Python from generating .pyc files in the container
+#     PYTHONDONTWRITEBYTECODE=1 \
+#     # make poetry install to this location
+#     POETRY_HOME="/opt/poetry" \
+#     # make poetry create the virtual environment in the project's root
+#     # it gets named `.venv`
+#     # POETRY_VIRTUALENVS_CREATE=1 \
+#     POETRY_VIRTUALENVS_IN_PROJECT=1 \
+#     # do not ask any interactive question
+#     # POETRY_NO_INTERACTION=1 \
+#     # PYPI_HOST="rt-bus-nxs-p1.trcont.ru/repository/esb-pypi-proxy/simple/" \
+#     POETRY_VERSION=1.3.2
 
-RUN apt-get update && apt-get install nala -y
-RUN nala install --no-install-recommends -y curl build-essential gnupg \
-  && nala install -y libpq-dev \
-  && curl -sSL https://install.python-poetry.org | python3 - --version $POETRY_VERSION \
-  && nala autoremove -y \
-  && nala clean \
-  && rm -rf /var/lib/apt/lists/*
+# RUN apt-get update && apt-get install --no-install-recommends -y curl build-essential gnupg \
+#   && apt-get install -y libpq-dev \
+#   && curl -sSL https://install.python-poetry.org | python3 - --version $POETRY_VERSION \
+#   && apt-get autoremove -y \
+#   && apt-get clean \
+#   && rm -rf /var/lib/apt/lists/*
+# ENV PATH="${PATH}:/opt/poetry/bin"
 
-ENV PATH="${PATH}:/opt/poetry/bin"
+# RUN mkdir $WORKDIR
+# WORKDIR $WORKDIR
 
-RUN mkdir $WORKDIR
-WORKDIR $WORKDIR
+# RUN python -m venv "${WORKDIR}/django_telegram_bot/.venv"
+# # Make sure we use the virtualenv:
+# ENV PATH="${WORKDIR}/django_telegram_bot/.venv/bin:$PATH"
 
-RUN python -m venv "${WORKDIR}/.venv"
-# Make sure we use the virtualenv:
-ENV PATH="${WORKDIR}/.venv/bin:$PATH"
+# # Не уверен, нужно ли это...
+# # RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -y | sh
+# # RUN echo ${HOME}
+# # RUN ls -l ~/.cargo 
+# # ENV PATH="${WORKDIR}/.cargo/bin:$PATH"
+# # RUN source "${WORKDIR}/.cargo/env"
 
-# RUN pip config --global set global.index-url https://$PYPI_HOST \
-#   && pip config --global set global.trusted-host $PYPI_HOST \
-#   && pip install --upgrade pip \
-#   && pip install orjson
-RUN pip install --upgrade pip && pip install orjson
 
-# COPY poetry.lock pyproject.toml ./
-COPY . ./
-RUN poetry install
+# # RUN pip config --global set global.index-url https://$PYPI_HOST \
+# #   && pip config --global set global.trusted-host $PYPI_HOST \
+# #   && pip install --upgrade pip \
+# #   && pip install orjson
 
-FROM python:3.12.0a7-bullseye AS final
-LABEL maintainer="<ahousetov@gmail.com>" \
-      version="3.12.0a7-bullseye"
-ARG WORKDIR=/senderBotAdmin
-COPY --from=builder $WORKDIR $WORKDIR
-ENV PATH="${WORKDIR}/.venv/bin:$PATH"
+# # RUN pip install --upgrade pip && pip install orjson
+# RUN pip install --upgrade pip
 
-WORKDIR $WORKDIR
-RUN groupadd -r app && useradd -r -s /bin/sh -g app app \
-  && chown -R app:app $WORKDIR
+# # COPY poetry.lock pyproject.toml ./
+# COPY . /code
+# # SHELL ["/bin/bash", "-c", "source /code/.venv/bin/activate"]
+# # RUN source $(poetry env info --path)/bin/activate
+# RUN poetry install
 
-USER app
+# FROM python:3.12.0a7-bullseye AS final
+# LABEL maintainer="<ahousetov@gmail.com>" \
+#       version="3.12.0a7-bullseye"
+# ARG WORKDIR=/code
+# COPY --from=builder $WORKDIR $WORKDIR
+# ENV PATH="${WORKDIR}/django_telegram_bot/.venv/bin:$PATH"
+
+# WORKDIR $WORKDIR
+# RUN groupadd -r app && useradd -r -s /bin/sh -g app app \
+#   && chown -R app:app $WORKDIR/django_telegram_bot
+
+# USER app
 # COPY requirements.txt /code/
 # RUN pip install --upgrade pip
 # RUN pip install -r requirements.txt
 
 # COPY . /code/
+
+FROM python:3.8.10
+
+ENV PYTHONUNBUFFERED=1
+
+RUN mkdir /code
+WORKDIR /code
+
+COPY requirements.txt /code/
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
+
+COPY . /code/

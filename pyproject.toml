@@ -1,18 +1,18 @@
 [tool.poetry]
-name = "questionsbot"
+name = "django-telegram-bot"
 version = "0.1.0"
-description = "Бот для вебинаров"
-authors = ["Хаустов Александр Дмитриевич <khaustovad@trcont.ru>"]
+description = "\"Бот для вебинаров\""
+authors = ["Хаустов Александр Дмитриевич <ahousetov@gmail.com>"]
 readme = "README.md"
+packages = [{include = "django_telegram_bot"}]
 
 [tool.poetry.dependencies]
 python = "^3.8"
-setuptools = "^67.7.1"
 pytz = "^2023.3"
-django = "3.2.9"
 requests = "^2.30.0"
 python-dotenv = "^1.0.0"
 ipython = "8.5.0"
+django = "3.2.9"
 django-cors-headers = "3.13.0"
 django-debug-toolbar = "3.6.0"
 whitenoise = "6.2.0"
@@ -24,10 +24,8 @@ celery = "5.2.7"
 redis = "4.3.4"
 django-celery-beat = "2.3.0"
 python-telegram-bot = "20.2"
+setuptools = "67.6.1"
 
-
-[tool.poetry.group.dev.dependencies]
-black = "^23.3.0"
 
 [build-system]
 requires = ["poetry-core"]
