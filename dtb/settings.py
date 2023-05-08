@@ -45,6 +45,7 @@ INSTALLED_APPS = [
 
     # local apps
     'users.apps.UsersConfig',
+    'chats.apps.ChatsConfig',
 ]
 
 MIDDLEWARE = [
@@ -96,10 +97,22 @@ ASGI_APPLICATION = 'dtb.asgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': dj_database_url.config(conn_max_age=600, default="sqlite:///db.sqlite3"),
+# }
 DATABASES = {
-    'default': dj_database_url.config(conn_max_age=600, default="sqlite:///db.sqlite3"),
+    "default": {
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        'NAME': 'dtb_db',
+        'USER': 'myuser',
+        'PASSWORD': '123',
+        'HOST': 'localhost',
+        'PORT': 5432,
+        'OPTIONS': {
+            'connect_timeout': 10,
+        }
+    }
 }
-
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
@@ -152,6 +165,7 @@ CELERY_TASK_DEFAULT_QUEUE = 'default'
 
 # -----> TELEGRAM
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
+TELEGRAM_BOT_USERNAME = os.getenv("TELEGRAM_BOT_USERNAME")
 if TELEGRAM_TOKEN is None:
     logging.error(
         "Please provide TELEGRAM_TOKEN in .env file.\n"

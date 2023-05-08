@@ -17,6 +17,7 @@ from tgbot.handlers.admin import handlers as admin_handlers
 from tgbot.handlers.location import handlers as location_handlers
 from tgbot.handlers.onboarding import handlers as onboarding_handlers
 from tgbot.handlers.broadcast_message import handlers as broadcast_handlers
+from tgbot.handlers.status_update import handlers as status_update_handlers
 from tgbot.main import bot
 
 
@@ -31,6 +32,10 @@ def setup_dispatcher(dp):
     dp.add_handler(CommandHandler("admin", admin_handlers.admin))
     dp.add_handler(CommandHandler("stats", admin_handlers.stats))
     dp.add_handler(CommandHandler('export_users', admin_handlers.export_users))
+
+    # invite or leave chat handlers
+    dp.add_handler(MessageHandler(Filters.status_update.new_chat_members, status_update_handlers.add_bot_to_chat))
+    dp.add_handler(MessageHandler(Filters.status_update.left_chat_member, status_update_handlers.remove_bot_from_chat))
 
     # location
     dp.add_handler(CommandHandler("ask_location", location_handlers.ask_for_location))

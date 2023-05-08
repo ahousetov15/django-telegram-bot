@@ -21,7 +21,7 @@ class User(CreateUpdateTracker):
     username = models.CharField(max_length=32, **nb)
     first_name = models.CharField(max_length=256)
     last_name = models.CharField(max_length=256, **nb)
-    language_code = models.CharField(max_length=8, help_text="Telegram client's lang", **nb)
+    language_code = models.CharField(max_length=8, help_text="Язык пользователя", **nb)
     deep_link = models.CharField(max_length=64, **nb)
 
     is_blocked_bot = models.BooleanField(default=False)
@@ -33,6 +33,27 @@ class User(CreateUpdateTracker):
 
     def __str__(self):
         return f'@{self.username}' if self.username is not None else f'{self.user_id}'
+
+    @classmethod
+    def get_admins(cls):
+        return cls.admins
+
+    @classmethod
+    def get_admins_dict(cls):
+        admins = cls.admins.values()
+        admins_dict = {
+            adm["user_id"]: {
+                "username": adm["username"],
+                "first_name": adm["first_name"],
+                "last_name": adm["last_name"],
+                "language_code": adm["language_code"],
+                "deep_link": adm["deep_link"],
+                "is_blocked_bot": adm["is_blocked_bot"]
+            }
+            for adm in admins
+        }
+        return admins_dict
+
 
     @classmethod
     def get_user_and_created(cls, update: Update, context: CallbackContext) -> Tuple[User, bool]:
@@ -54,6 +75,12 @@ class User(CreateUpdateTracker):
     def get_user(cls, update: Update, context: CallbackContext) -> User:
         u, _ = cls.get_user_and_created(update, context)
         return u
+
+    @classmethod
+    def notify_admins(cls, update: Update, context: CallbackContext, message: str):
+        admins_dict = cls.get_admins_dict()
+        for admin_chat_id, admin_values in admins_dict.values():
+            context.bot.send_message(chat_id=admin_chat_id, text=message)
 
     @classmethod
     def get_user_by_username_or_user_id(cls, username_or_user_id: Union[str, int]) -> Optional[User]:
