@@ -40,7 +40,8 @@ def setup_dispatcher(dp):
     # invite or leave chat handlers
     dp.add_handler(MessageHandler(Filters.status_update.new_chat_members, status_update_handlers.add_bot_to_chat))
     dp.add_handler(MessageHandler(Filters.status_update.left_chat_member, status_update_handlers.remove_bot_from_chat))
-
+    dp.add_handler(CallbackQueryHandler(message_handlers.ask_question))
+    
     # # location
     # dp.add_handler(CommandHandler("ask_location", location_handlers.ask_for_location))
     # dp.add_handler(MessageHandler(Filters.location, location_handlers.location_handler))

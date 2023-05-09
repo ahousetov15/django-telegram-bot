@@ -6,8 +6,9 @@ from tgbot.handlers.onboarding.static_text import github_button_text, secret_lev
 
 def make_keyboard_for_start_command() -> InlineKeyboardMarkup:
     buttons = [[
-        InlineKeyboardButton(github_button_text, url="https://github.com/ohld/django-telegram-bot"),
-        InlineKeyboardButton(secret_level_button_text, callback_data=f'{SECRET_LEVEL_BUTTON}')
+        # InlineKeyboardButton(github_button_text, url="https://github.com/ohld/django-telegram-bot"),
+        # InlineKeyboardButton(secret_level_button_text, callback_data=f'{SECRET_LEVEL_BUTTON}'),
+        InlineKeyboardButton("Задать вопрос", callback_data="ask_question")
     ]]
 
     return InlineKeyboardMarkup(buttons)

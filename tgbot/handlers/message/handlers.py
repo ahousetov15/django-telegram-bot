@@ -2,6 +2,7 @@ from telegram import Update
 from telegram.ext import CallbackContext
 from chats.models import Chats
 from users.models import User
+from questions.models import Question
 from dtb.settings import MSK_TZ
 
 
@@ -46,21 +47,28 @@ def handle_message_or_question(update: Update, context: CallbackContext):
         "waiting_for_question" in context.user_data
         and context.user_data["waiting_for_question"]
     ):
-        if TARGET_CHAT_ID:
-            context.bot.send_message(
-                chat_id=TARGET_CHAT_ID, text=question_formatting(update)
-            )
-        else:
-            User.notify_admins(
+        new_question, created = Question.add_question(update=update, context=context)
+        if created:
+            if TARGET_CHAT_ID:
+                context.bot.send_message(
+                    chat_id=TARGET_CHAT_ID, text=question_formatting(update)
+                )
+            else:
+                User.notify_admins(
                 update=update,
                 context=context,
                 message=notification_formatting(update=update),
-            )
+                )
 
-        update.message.reply_text(
-            text="Ваш вопрос был успешно отправлен.",
-            reply_to_message_id=update.message.message_id,
-        )
+            update.message.reply_text(
+                text="Ваш вопрос был успешно отправлен.",
+                reply_to_message_id=update.message.message_id,
+            )
+        else:
+            update.message.reply_text(
+                text="По какой-то причине, ваш запрос не отправлен.",
+                reply_to_message_id=update.message.message_id,
+            ) 
         context.user_data["waiting_for_question"] = False
     else:
         if TARGET_CHAT_ID:
