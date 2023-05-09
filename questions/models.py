@@ -11,7 +11,7 @@ from telegram.ext import CallbackContext
 from utils.models import CreateTracker, datetime_str
 from typing import Tuple
 
-
+QUESTION_MAX_LENGTH = 100
 
 class Question(CreateTracker):
     msg_id = models.BigAutoField(primary_key=True, verbose_name="Номер сообщения")  # telegram_id
@@ -45,6 +45,24 @@ class Question(CreateTracker):
         return excel_file_name
 
 
+    def wrap_text(text: str, max_width: int) -> str:
+        words = text.split(' ')
+        lines = []
+        current_line = []
+
+        for word in words:
+            if len(' '.join(current_line + [word])) <= max_width:
+                current_line.append(word)
+            else:
+                lines.append(' '.join(current_line))
+                current_line = [word]
+
+        if current_line:
+            lines.append(' '.join(current_line))
+
+        return '\n'.join(lines)
+
+
     @classmethod
     def export_question_to_excel(cls) -> Tuple[str, File]:
         questions = cls.objects.all()
@@ -54,7 +72,8 @@ class Question(CreateTracker):
         worksheet.title = cls.generate_excel_file_name(questions)
            
         # Определение стилей
-        bold_font = Font(bold=True)
+        bold_font = Font(bold=True, size=16)
+        big_font = Font(bold=False, size=16)
         centered_alignment = Alignment(horizontal='center', vertical='center')
         thin_border = Border(
             left=Side(style="thin"),
@@ -94,6 +113,7 @@ class Question(CreateTracker):
         for row_num, question in enumerate(questions, 3):
             # Номер сообщения
             cell = worksheet.cell(row=row_num, column=1)
+            cell.font = big_font
             cell.value = question.msg_id
             cell.alignment = centered_alignment
             cell.border = thin_border
@@ -107,17 +127,25 @@ class Question(CreateTracker):
             ]
             for col_num, value in enumerate(sender_values, 2):
                 cell = worksheet.cell(row=row_num, column=col_num)
+                cell.font = big_font
                 cell.value = value
                 cell.alignment = centered_alignment
                 cell.border = thin_border
 
             # Вопрос
             cell = worksheet.cell(row=row_num, column=5)
-            cell.value = question.text
+            cell.font = big_font
+            cell.value = cls.wrap_text(question.text, QUESTION_MAX_LENGTH)
+            cell.alignment = Alignment(horizontal='left', vertical='center', wrap_text=True)  # Добавьте wrap_text=True
             cell.border = thin_border
+
+            # Установка высоты строки в зависимости от количества строк текста вопроса
+            wrapped_lines = cell.value.count('\n') + 1
+            worksheet.row_dimensions[row_num].height = wrapped_lines * 18  # Выберите подходящий множитель для высоты строки
 
             # Дата и время
             cell = worksheet.cell(row=row_num, column=6)
+            cell.font = big_font
             cell.value = f"{datetime_str(question.created_at)} по Москве"
             cell.alignment = centered_alignment
             cell.border = thin_border
@@ -127,8 +155,14 @@ class Question(CreateTracker):
             non_merged_cells = [cell for cell in column_cells if not isinstance(cell, openpyxl.cell.MergedCell)]
             if not non_merged_cells:
                 continue
-            length = max(len(str(cell.value)) for cell in non_merged_cells)
-            worksheet.column_dimensions[non_merged_cells[0].column_letter].width = length
+
+            if col_index == 4:  # Индекс столбца "Вопрос" (начиная с 0)
+                max_char_width = max(len(str(cell.value)) for cell in non_merged_cells) / QUESTION_MAX_LENGTH
+                target_width = QUESTION_MAX_LENGTH/2 * max_char_width
+            else:
+                target_width = max(len(str(cell.value)) + 8 for cell in non_merged_cells)
+
+            worksheet.column_dimensions[non_merged_cells[0].column_letter].width = target_width
 
         excel_file = BytesIO()
         workbook.save(excel_file)
