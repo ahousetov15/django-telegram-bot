@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 from telegram import Update
 from telegram.ext import CallbackContext
 from utils.models import CreateUpdateTracker, nb, CreateTracker, GetOrNoneManager
@@ -34,6 +35,16 @@ class Chats(models.Model):
         return bot_chat_dict
 
     @classmethod
+    def set_chat_as_support(cls, chat_id):
+        not_support_chats = list(cls.objects.filter(~Q(chat_id=chat_id)))
+        for chat in not_support_chats:
+            chat.is_support_chat = False
+        cls.objects.bulk_update(not_support_chats, ["is_support_chat"])
+        new_support_chat = cls.objects.get(chat_id=chat_id)
+        new_support_chat.is_support_chat = True
+        new_support_chat.save()
+
+    @classmethod
     def add_chat(cls, update: Update, context: CallbackContext) -> Tuple[dict, bool]:
         """Если бота добавили в чат, нужно добавить его в БД"""
         chat_id = update.message.chat_id
@@ -47,6 +58,7 @@ class Chats(models.Model):
                     )
                     if created:
                         chat.save()
+                        cls.set_chat_as_support(chat_id)
                         return model_to_dict(chat), created
         return None, False
 
