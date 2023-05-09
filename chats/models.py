@@ -9,6 +9,9 @@ from django.forms.models import model_to_dict
 
 
 class Chats(models.Model):
+    class Meta:
+        verbose_name_plural = "Chats"
+
     chat_id = models.BigAutoField(primary_key=True)  # telegram_id
     chat_name = models.CharField(max_length=1024, **nb)
     is_support_chat = models.BooleanField(default=False)
@@ -33,6 +36,14 @@ class Chats(models.Model):
             for chat in bot_chats
         }
         return bot_chat_dict
+
+    @classmethod
+    def get_support_chat_id(cls):
+        try:
+            support_chat = cls.objects.get(is_support_chat=True)
+            return support_chat.chat_id
+        except models.Model.DoesNotExist:
+            return None
 
     @classmethod
     def set_chat_as_support(cls, chat_id):

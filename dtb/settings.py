@@ -4,7 +4,7 @@ import sys
 
 import dj_database_url
 import dotenv
-
+import pytz
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     # local apps
     'users.apps.UsersConfig',
     'chats.apps.ChatsConfig',
+    'questions.apps.QuestionsConfig',
 ]
 
 MIDDLEWARE = [
@@ -151,6 +152,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'ru-RU'
 TIME_ZONE = 'Europe/Moscow'
+MSK_TZ = pytz.timezone(TIME_ZONE)
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
