@@ -12,9 +12,9 @@ class Chats(models.Model):
     class Meta:
         verbose_name_plural = "Chats"
 
-    chat_id = models.BigAutoField(primary_key=True)  # telegram_id
-    chat_name = models.CharField(max_length=1024, **nb)
-    is_support_chat = models.BooleanField(default=False)
+    chat_id = models.BigAutoField(primary_key=True, verbose_name='Номер чата')  # telegram_id
+    chat_name = models.CharField(max_length=1024, **nb, verbose_name='Название')
+    is_support_chat = models.BooleanField(default=False, verbose_name='Чат поддержки')
 
     objects = GetOrNoneManager()
 

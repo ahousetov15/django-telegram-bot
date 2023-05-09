@@ -1,13 +1,15 @@
+import datetime
 from django.db import models
 from users.models import User
 from telegram import Update
 from telegram.ext import CallbackContext
+from utils.models import CreateTracker
 
 
-class Question(models.Model):
-    msg_id = models.BigAutoField(primary_key=True)  # telegram_id
-    user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
-    text = models.TextField()
+class Question(CreateTracker):
+    msg_id = models.BigAutoField(primary_key=True, verbose_name="Номер сообщения")  # telegram_id
+    user = models.ForeignKey(User, verbose_name='Отправитель', on_delete=models.DO_NOTHING)
+    text = models.TextField(verbose_name='Вопрос')
 
     def __str__(self):
         return f'msg {self.msg_id} from {self.user}'
