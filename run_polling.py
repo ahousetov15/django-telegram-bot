@@ -6,7 +6,7 @@ django.setup()
 from telegram import Bot
 from telegram.ext import Updater
 
-from dtb.settings import TELEGRAM_TOKEN
+from dtb.settings import TELEGRAM_TOKEN, TELEGRAM_BOT_USERNAME
 from tgbot.dispatcher import setup_dispatcher
 
 

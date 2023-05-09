@@ -20,6 +20,7 @@ class UserAdmin(admin.ModelAdmin):
         'created_at', 'updated_at', "is_blocked_bot",
     ]
     list_filter = ["is_blocked_bot", ]
+    list_display_links = ("user_id", 'username', 'first_name', 'last_name',)
     search_fields = ('username', 'user_id')
 
     actions = ['broadcast']

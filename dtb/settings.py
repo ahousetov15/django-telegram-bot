@@ -100,6 +100,20 @@ ASGI_APPLICATION = 'dtb.asgi.application'
 # DATABASES = {
 #     'default': dj_database_url.config(conn_max_age=600, default="sqlite:///db.sqlite3"),
 # }
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql_psycopg2",
+#         'NAME': 'mydb',
+#         'USER': 'myuser',
+#         'PASSWORD': '123',
+#         'HOST': 'localhost',
+#         'PORT': 5432,
+#         'OPTIONS': {
+#             'connect_timeout': 10,
+#         }
+#     }
+# }
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
@@ -107,7 +121,7 @@ DATABASES = {
         'USER': 'myuser',
         'PASSWORD': '123',
         'HOST': 'localhost',
-        'PORT': 5432,
+        'PORT': 8787,
         'OPTIONS': {
             'connect_timeout': 10,
         }
@@ -166,6 +180,7 @@ CELERY_TASK_DEFAULT_QUEUE = 'default'
 # -----> TELEGRAM
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 TELEGRAM_BOT_USERNAME = os.getenv("TELEGRAM_BOT_USERNAME")
+ADMINS_BY_DEFAULT = os.getenv("ADMINS_BY_DEFAULT").split(',')
 if TELEGRAM_TOKEN is None:
     logging.error(
         "Please provide TELEGRAM_TOKEN in .env file.\n"

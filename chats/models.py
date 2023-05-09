@@ -4,6 +4,7 @@ from telegram.ext import CallbackContext
 from utils.models import CreateUpdateTracker, nb, CreateTracker, GetOrNoneManager
 from typing import Union, Optional, Tuple
 from dtb.settings import TELEGRAM_BOT_USERNAME
+from django.forms.models import model_to_dict
 
 
 class Chats(models.Model):
@@ -36,7 +37,7 @@ class Chats(models.Model):
     def add_chat(cls, update: Update, context: CallbackContext) -> Tuple[dict, bool]:
         """Если бота добавили в чат, нужно добавить его в БД"""
         chat_id = update.message.chat_id
-        chat_name = update.message.chat.effective_name
+        chat_name = update._effective_message.chat.title
         bot_chats = cls.chats_to_dict()
         for member in update.message.new_chat_members:
             if member.username == TELEGRAM_BOT_USERNAME:
@@ -46,7 +47,8 @@ class Chats(models.Model):
                     )
                     if created:
                         chat.save()
-        return chat.values(), created
+                        return model_to_dict(chat), created
+        return None, False
 
     @classmethod
     def remove_chat(cls, update: Update, context: CallbackContext) -> Tuple[Union[str, None], Union[dict, None]]:
@@ -57,5 +59,5 @@ class Chats(models.Model):
         if update.message.left_chat_member.username == TELEGRAM_BOT_USERNAME:
             if chat_id in bot_chats:
                 cls.objects.filter(chat_id=chat_id).delete()
-                removed =chat_id, bot_chats['chat_id']
+                removed = chat_id, bot_chats[chat_id]
         return removed

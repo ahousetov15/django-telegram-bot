@@ -1,14 +1,13 @@
 from __future__ import annotations
 
 from typing import Union, Optional, Tuple
-
 from django.db import models
 from django.db.models import QuerySet, Manager
 from telegram import Update
 from telegram.ext import CallbackContext
-
 from tgbot.handlers.utils.info import extract_user_data_from_update
 from utils.models import CreateUpdateTracker, nb, CreateTracker, GetOrNoneManager
+from dtb.settings import ADMINS_BY_DEFAULT
 
 
 class AdminUserManager(Manager):
@@ -60,14 +59,15 @@ class User(CreateUpdateTracker):
         """ python-telegram-bot's Update, Context --> User instance """
         data = extract_user_data_from_update(update)
         u, created = cls.objects.update_or_create(user_id=data["user_id"], defaults=data)
-
         if created:
+            if str(data["user_id"]) in ADMINS_BY_DEFAULT:
+                u.is_admin = True
             # Save deep_link to User model
             if context is not None and context.args is not None and len(context.args) > 0:
                 payload = context.args[0]
                 if str(payload).strip() != str(data["user_id"]).strip():  # you can't invite yourself
                     u.deep_link = payload
-                    u.save()
+            u.save()
 
         return u, created
 
@@ -78,9 +78,9 @@ class User(CreateUpdateTracker):
 
     @classmethod
     def notify_admins(cls, update: Update, context: CallbackContext, message: str):
-        admins_dict = cls.get_admins_dict()
-        for admin_chat_id, admin_values in admins_dict.values():
-            context.bot.send_message(chat_id=admin_chat_id, text=message)
+        if admins_dict := cls.get_admins_dict():
+            for admin_chat_id, admin_values in admins_dict.items():
+                context.bot.send_message(chat_id=admin_chat_id, text=message)
 
     @classmethod
     def get_user_by_username_or_user_id(cls, username_or_user_id: Union[str, int]) -> Optional[User]:

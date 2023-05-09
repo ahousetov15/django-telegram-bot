@@ -22,3 +22,4 @@ class QuestionsAdmin(admin.ModelAdmin):
     form = QuestionsAdminForm
     list_display = ['msg_id', 'user', 'text']
     search_fields = ('msg_id', 'text')
+    list_display_links = ('msg_id', 'text',)
