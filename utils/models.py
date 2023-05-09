@@ -1,5 +1,7 @@
+import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
+from dtb.settings import MSK_TZ
 
 
 nb = dict(null=True, blank=True)
@@ -27,3 +29,17 @@ class GetOrNoneManager(models.Manager):
             return self.get(**kwargs)
         except ObjectDoesNotExist:
             return None
+        
+def datetime_str(dt_obj: datetime) -> str:
+    if dt_obj:
+        dt_obj = dt_obj.astimezone(MSK_TZ).strftime('%Y-%m-%d %H-%M-%S')
+    else:
+       dt_obj = datetime.datetime.now().astimezone(MSK_TZ).strftime('%Y-%m-%d %H-%M-%S')
+    return dt_obj
+
+def datetime_by_msk(dt_obj: datetime) -> datetime:
+    if dt_obj:
+        dt_obj = dt_obj.astimezone(MSK_TZ)
+    else:
+       dt_obj = datetime.datetime.now().astimezone(MSK_TZ)
+    return dt_obj
