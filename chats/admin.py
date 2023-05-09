@@ -4,6 +4,9 @@ from chats.models import Chats
 
 @admin.register(Chats)
 class ChatsAdmin(admin.ModelAdmin):
-    list_display = ['chat_id', 'chat_name', 'is_support_chat']
-    search_fields = ('chat_id', 'chat_name')
-    list_display_links = ('chat_id', 'chat_name',)
+    list_display = ["chat_id", "chat_name", "is_support_chat"]
+    search_fields = ("chat_id", "chat_name")
+    list_display_links = (
+        "chat_id",
+        "chat_name",
+    )

@@ -12,9 +12,11 @@ class Chats(models.Model):
     class Meta:
         verbose_name_plural = "Chats"
 
-    chat_id = models.BigAutoField(primary_key=True, verbose_name='Номер чата')  # telegram_id
-    chat_name = models.CharField(max_length=1024, **nb, verbose_name='Название')
-    is_support_chat = models.BooleanField(default=False, verbose_name='Чат поддержки')
+    chat_id = models.BigAutoField(
+        primary_key=True, verbose_name="Номер чата"
+    )  # telegram_id
+    chat_name = models.CharField(max_length=1024, **nb, verbose_name="Название")
+    is_support_chat = models.BooleanField(default=False, verbose_name="Чат поддержки")
 
     objects = GetOrNoneManager()
 
@@ -74,7 +76,9 @@ class Chats(models.Model):
         return None, False
 
     @classmethod
-    def remove_chat(cls, update: Update, context: CallbackContext) -> Tuple[Union[str, None], Union[dict, None]]:
+    def remove_chat(
+        cls, update: Update, context: CallbackContext
+    ) -> Tuple[Union[str, None], Union[dict, None]]:
         """Если бот удалили(удалился) из чата, нужно убраться его из БД"""
         removed = None
         chat_id = update.message.chat_id

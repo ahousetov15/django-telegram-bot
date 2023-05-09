@@ -13,79 +13,85 @@ from typing import Tuple
 
 QUESTION_MAX_LENGTH = 100
 
+
 class Question(CreateTracker):
-    msg_id = models.BigAutoField(primary_key=True, verbose_name="Номер сообщения")  # telegram_id
-    user = models.ForeignKey(User, verbose_name='Отправитель', on_delete=models.DO_NOTHING)
-    text = models.TextField(verbose_name='Вопрос')
+    msg_id = models.BigAutoField(
+        primary_key=True, verbose_name="Номер сообщения"
+    )  # telegram_id
+    user = models.ForeignKey(
+        User, verbose_name="Отправитель", on_delete=models.DO_NOTHING
+    )
+    text = models.TextField(verbose_name="Вопрос")
 
     def __str__(self):
-        return f'msg {self.msg_id} from {self.user}'
-
+        return f"msg {self.msg_id} from {self.user}"
 
     @classmethod
     def add_question(cls, update: Update, context: CallbackContext):
         user, created = User.get_user_and_created(update=update, context=context)
         new_question, created = cls.objects.update_or_create(
-            msg_id=update.message.message_id,
-            user=user,
-            text=update.message.text
+            msg_id=update.message.message_id, user=user, text=update.message.text
         )
         return new_question, created
-    
+
     def generate_excel_file_name(queryset: QuerySet):
         count = str(queryset.count())
-        first_date, last_date = datetime_str(queryset.first().created_at), datetime_str(queryset.last().created_at)
-        if count.endswith('1'):
-            question_numerals = 'вопрос'
-        elif count.endswith(('2','3','4',)):
-            question_numerals = 'вопроса'
+        first_date, last_date = datetime_str(queryset.first().created_at), datetime_str(
+            queryset.last().created_at
+        )
+        if count.endswith("1"):
+            question_numerals = "вопрос"
+        elif count.endswith(
+            (
+                "2",
+                "3",
+                "4",
+            )
+        ):
+            question_numerals = "вопроса"
         else:
-            question_numerals = 'вопросов'
+            question_numerals = "вопросов"
         excel_file_name = f"{count} {question_numerals} заданных с {first_date} по {last_date} по Москве"
         return excel_file_name
 
-
     def wrap_text(text: str, max_width: int) -> str:
-        words = text.split(' ')
+        words = text.split(" ")
         lines = []
         current_line = []
 
         for word in words:
-            if len(' '.join(current_line + [word])) <= max_width:
+            if len(" ".join(current_line + [word])) <= max_width:
                 current_line.append(word)
             else:
-                lines.append(' '.join(current_line))
+                lines.append(" ".join(current_line))
                 current_line = [word]
 
         if current_line:
-            lines.append(' '.join(current_line))
+            lines.append(" ".join(current_line))
 
-        return '\n'.join(lines)
-
+        return "\n".join(lines)
 
     @classmethod
     def export_question_to_excel(cls) -> Tuple[str, File]:
         questions = cls.objects.all()
-        
+
         workbook = openpyxl.Workbook()
         worksheet = workbook.active
         worksheet.title = cls.generate_excel_file_name(questions)
-           
+
         # Определение стилей
         bold_font = Font(bold=True, size=16)
         big_font = Font(bold=False, size=16)
-        centered_alignment = Alignment(horizontal='center', vertical='center')
+        centered_alignment = Alignment(horizontal="center", vertical="center")
         thin_border = Border(
             left=Side(style="thin"),
             right=Side(style="thin"),
             top=Side(style="thin"),
-            bottom=Side(style="thin")
+            bottom=Side(style="thin"),
         )
 
-         # Заголовки таблицы
-        headers = [
-            'Номер сообщения', 'Отправитель', '', '', 'Вопрос', 'Задан'
-        ]
+        # Заголовки таблицы
+        headers = ["Номер сообщения", "Отправитель", "", "", "Вопрос", "Задан"]
 
         for col_num, header in enumerate(headers, 1):
             cell = worksheet.cell(row=1, column=col_num)
@@ -94,8 +100,7 @@ class Question(CreateTracker):
             cell.alignment = centered_alignment
             cell.border = thin_border
 
-
-        sender_headers = ['@никнейм', 'имя', 'фамилия']
+        sender_headers = ["@никнейм", "имя", "фамилия"]
         for col_num, header in enumerate(sender_headers, 2):
             cell = worksheet.cell(row=2, column=col_num)
             cell.value = header
@@ -118,7 +123,6 @@ class Question(CreateTracker):
             cell.alignment = centered_alignment
             cell.border = thin_border
 
-
             # Отправитель
             sender_values = [
                 f"@{str(question.user.username)}",
@@ -136,12 +140,16 @@ class Question(CreateTracker):
             cell = worksheet.cell(row=row_num, column=5)
             cell.font = big_font
             cell.value = cls.wrap_text(question.text, QUESTION_MAX_LENGTH)
-            cell.alignment = Alignment(horizontal='left', vertical='center', wrap_text=True)  # Добавьте wrap_text=True
+            cell.alignment = Alignment(
+                horizontal="left", vertical="center", wrap_text=True
+            )  # Добавьте wrap_text=True
             cell.border = thin_border
 
             # Установка высоты строки в зависимости от количества строк текста вопроса
-            wrapped_lines = cell.value.count('\n') + 1
-            worksheet.row_dimensions[row_num].height = wrapped_lines * 18  # Выберите подходящий множитель для высоты строки
+            wrapped_lines = cell.value.count("\n") + 1
+            worksheet.row_dimensions[row_num].height = (
+                wrapped_lines * 18
+            )  # Выберите подходящий множитель для высоты строки
 
             # Дата и время
             cell = worksheet.cell(row=row_num, column=6)
@@ -152,19 +160,30 @@ class Question(CreateTracker):
 
         # Автоматическое изменение ширины столбцов
         for col_index, column_cells in enumerate(worksheet.columns):
-            non_merged_cells = [cell for cell in column_cells if not isinstance(cell, openpyxl.cell.MergedCell)]
+            non_merged_cells = [
+                cell
+                for cell in column_cells
+                if not isinstance(cell, openpyxl.cell.MergedCell)
+            ]
             if not non_merged_cells:
                 continue
 
             if col_index == 4:  # Индекс столбца "Вопрос" (начиная с 0)
-                max_char_width = max(len(str(cell.value)) for cell in non_merged_cells) / QUESTION_MAX_LENGTH
-                target_width = QUESTION_MAX_LENGTH/2 * max_char_width
+                max_char_width = (
+                    max(len(str(cell.value)) for cell in non_merged_cells)
+                    / QUESTION_MAX_LENGTH
+                )
+                target_width = QUESTION_MAX_LENGTH / 2 * max_char_width
             else:
-                target_width = max(len(str(cell.value)) + 8 for cell in non_merged_cells)
+                target_width = max(
+                    len(str(cell.value)) + 8 for cell in non_merged_cells
+                )
 
-            worksheet.column_dimensions[non_merged_cells[0].column_letter].width = target_width
+            worksheet.column_dimensions[
+                non_merged_cells[0].column_letter
+            ].width = target_width
 
         excel_file = BytesIO()
         workbook.save(excel_file)
-        excel_file.seek(0)          
-        return f"{worksheet.title}.xlsx", excel_file 
+        excel_file.seek(0)
+        return f"{worksheet.title}.xlsx", excel_file

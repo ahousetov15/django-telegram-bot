@@ -15,6 +15,7 @@ def ask_question(update: Update, context: CallbackContext):
     context.user_data["waiting_for_question"] = True
     query.edit_message_text("Пожалуйста, введите ваш вопрос.")
 
+
 @send_typing_action
 def export_questions(update: Update, context: CallbackContext):
     file_name, excel_questions = Question.export_question_to_excel()
@@ -24,7 +25,10 @@ def export_questions(update: Update, context: CallbackContext):
         update.message.reply_text(static_text.only_for_admins_ru)
         return
     with excel_questions as file:
-        context.bot.send_document(chat_id=u.user_id, document=InputFile(file, filename=file_name))
+        context.bot.send_document(
+            chat_id=u.user_id, document=InputFile(file, filename=file_name)
+        )
+
 
 def question_formatting(update: Update):
     result = f"#вопрос\n"
@@ -68,9 +72,9 @@ def handle_message_or_question(update: Update, context: CallbackContext):
                 )
             else:
                 User.notify_admins(
-                update=update,
-                context=context,
-                message=notification_formatting(update=update),
+                    update=update,
+                    context=context,
+                    message=notification_formatting(update=update),
                 )
 
             update.message.reply_text(
@@ -81,7 +85,7 @@ def handle_message_or_question(update: Update, context: CallbackContext):
             update.message.reply_text(
                 text="По какой-то причине, ваш запрос не отправлен.",
                 reply_to_message_id=update.message.message_id,
-            ) 
+            )
         context.user_data["waiting_for_question"] = False
     else:
         if TARGET_CHAT_ID:

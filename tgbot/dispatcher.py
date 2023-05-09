@@ -2,8 +2,10 @@
     Telegram event handlers
 """
 from telegram.ext import (
-    Dispatcher, Filters,
-    CommandHandler, MessageHandler,
+    Dispatcher,
+    Filters,
+    CommandHandler,
+    MessageHandler,
     CallbackQueryHandler,
 )
 
@@ -35,13 +37,31 @@ def setup_dispatcher(dp):
     # dp.add_handler(CommandHandler('export_users', admin_handlers.export_users))
 
     # processing msg or questions
-    dp.add_handler(MessageHandler(Filters.text, message_handlers.handle_message_or_question))
+    dp.add_handler(
+        MessageHandler(Filters.text, message_handlers.handle_message_or_question)
+    )
 
     # invite or leave chat handlers
-    dp.add_handler(MessageHandler(Filters.status_update.new_chat_members, status_update_handlers.add_bot_to_chat))
-    dp.add_handler(MessageHandler(Filters.status_update.left_chat_member, status_update_handlers.remove_bot_from_chat))
-    dp.add_handler(CallbackQueryHandler(message_handlers.ask_question, pattern='^ask_question$'))
-    dp.add_handler(CallbackQueryHandler(message_handlers.export_questions, pattern='^export_questions$'))
+    dp.add_handler(
+        MessageHandler(
+            Filters.status_update.new_chat_members,
+            status_update_handlers.add_bot_to_chat,
+        )
+    )
+    dp.add_handler(
+        MessageHandler(
+            Filters.status_update.left_chat_member,
+            status_update_handlers.remove_bot_from_chat,
+        )
+    )
+    dp.add_handler(
+        CallbackQueryHandler(message_handlers.ask_question, pattern="^ask_question$")
+    )
+    dp.add_handler(
+        CallbackQueryHandler(
+            message_handlers.export_questions, pattern="^export_questions$"
+        )
+    )
 
     # # location
     # dp.add_handler(CommandHandler("ask_location", location_handlers.ask_for_location))
@@ -82,4 +102,6 @@ def setup_dispatcher(dp):
 
 
 n_workers = 0 if DEBUG else 4
-dispatcher = setup_dispatcher(Dispatcher(bot, update_queue=None, workers=n_workers, use_context=True))
+dispatcher = setup_dispatcher(
+    Dispatcher(bot, update_queue=None, workers=n_workers, use_context=True)
+)
