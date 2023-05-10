@@ -21,6 +21,7 @@ from tgbot.handlers.onboarding import handlers as onboarding_handlers
 from tgbot.handlers.broadcast_message import handlers as broadcast_handlers
 from tgbot.handlers.status_update import handlers as status_update_handlers
 from tgbot.handlers.message import handlers as message_handlers
+from tgbot.handlers.chats import handlers as chats_handlers
 from tgbot.main import bot
 
 
@@ -62,7 +63,16 @@ def setup_dispatcher(dp):
             message_handlers.export_questions, pattern="^export_questions$"
         )
     )
-
+    dp.add_handler(
+        CallbackQueryHandler(
+            chats_handlers.list_sup_chat, pattern="^list_sup_chat"
+        )
+    )
+    dp.add_handler(
+        CallbackQueryHandler(
+            chats_handlers.handle_support_chat, pattern="^support_chat_.*", pass_user_data=True
+        )
+    )
     # # location
     # dp.add_handler(CommandHandler("ask_location", location_handlers.ask_for_location))
     # dp.add_handler(MessageHandler(Filters.location, location_handlers.location_handler))

@@ -8,6 +8,7 @@ from dtb.settings import TELEGRAM_BOT_USERNAME
 from django.forms.models import model_to_dict
 
 
+
 class Chats(models.Model):
     class Meta:
         verbose_name_plural = "Chats"
@@ -48,7 +49,7 @@ class Chats(models.Model):
             return None
 
     @classmethod
-    def set_chat_as_support(cls, chat_id):
+    def set_chat_as_support(cls, chat_id: int):
         not_support_chats = list(cls.objects.filter(~Q(chat_id=chat_id)))
         for chat in not_support_chats:
             chat.is_support_chat = False
@@ -88,3 +89,16 @@ class Chats(models.Model):
                 cls.objects.filter(chat_id=chat_id).delete()
                 removed = chat_id, bot_chats[chat_id]
         return removed
+
+    @classmethod
+    def send_to_support_chat(cls, update: Update, context: CallbackContext, message: str):
+        """
+        Сообщение для чата поддержки.
+        
+        Если чат не установлен, уведомляем отправителя.
+        """
+        support_chat_id = cls.get_support_chat_id()
+        if support_chat_id is None:
+            pass
+        else:
+            context.bot.send_message(chat_id=support_chat_id, text=message)
