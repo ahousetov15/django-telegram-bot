@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from telegram import Update
 from telegram.ext import CallbackContext
@@ -6,7 +7,7 @@ from utils.models import CreateUpdateTracker, nb, CreateTracker, GetOrNoneManage
 from typing import Union, Optional, Tuple
 from dtb.settings import TELEGRAM_BOT_USERNAME
 from django.forms.models import model_to_dict
-
+from users.models import User
 
 
 class Chats(models.Model):
@@ -45,7 +46,7 @@ class Chats(models.Model):
         try:
             support_chat = cls.objects.get(is_support_chat=True)
             return support_chat.chat_id
-        except models.Model.DoesNotExist:
+        except ObjectDoesNotExist:
             return None
 
     @classmethod
@@ -74,6 +75,8 @@ class Chats(models.Model):
                         chat.save()
                         cls.set_chat_as_support(chat_id)
                         return model_to_dict(chat), created
+            else:
+               User.add_incoming_user(update=update, context=context)
         return None, False
 
     @classmethod

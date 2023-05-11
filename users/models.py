@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from typing import Union, Optional, Tuple
+from typing import Union, Optional, Tuple, List
 from django.db import models
 from django.db.models import QuerySet, Manager
 from telegram import Update
 from telegram.ext import CallbackContext
-from tgbot.handlers.utils.info import extract_user_data_from_update
+from tgbot.handlers.utils.info import extract_user_data_from_update, extract_new_chat_members_from_update
 from utils.models import CreateUpdateTracker, nb, CreateTracker, GetOrNoneManager
 from dtb.settings import ADMINS_BY_DEFAULT
 
@@ -60,6 +60,35 @@ class User(CreateUpdateTracker):
             for adm in admins
         }
         return admins_dict
+
+
+    @classmethod
+    # def add_incoming_user(cls, update: Update, context: CallbackContext) -> List[User]:
+    def add_incoming_user(cls, update: Update, context: CallbackContext):
+        data_list = extract_new_chat_members_from_update(update)
+        # created_users = []
+        for user in data_list:
+            u, created = cls.objects.update_or_create(
+                user_id=user["user_id"], defaults=user
+            )
+            if created:
+                if str(user["user_id"]) in ADMINS_BY_DEFAULT:
+                    u.is_admin = True
+                # Save deep_link to User model
+                if (
+                    context is not None
+                    and context.args is not None
+                    and len(context.args) > 0
+                ):
+                    payload = context.args[0]
+                    if (
+                        str(payload).strip() != str(user["user_id"]).strip()
+                    ):  # you can't invite yourself
+                        u.deep_link = payload
+                u.save()
+                # created_users.append(u)
+        # return created_users
+
 
     @classmethod
     def get_user_and_created(
