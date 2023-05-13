@@ -36,18 +36,22 @@ def handle_support_chat(update: Update, context: CallbackContext):
         "waiting_for_support_chat" in context.user_data
         and context.user_data["waiting_for_support_chat"]
     ):
+        chats = Chats.chats_to_dict()
         chat_id_selected = context.match.string[13:] # 'support_chat_-842387595'
         if chat_id_selected != str(TARGET_CHAT_ID):
             Chats.set_chat_as_support(chat_id=int(chat_id_selected))
             TARGET_CHAT_ID = Chats.get_support_chat_id()
             if chat_id_selected == str(TARGET_CHAT_ID):
-                chats = Chats.chats_to_dict()
                 update.callback_query.answer(
                     text=f"Чатом поддержки теперь является: '{chats[TARGET_CHAT_ID]['chat_name']}'"
                 )
                 update.callback_query.message.reply_text(
                     text=f"Чатом поддержки теперь является: '{chats[TARGET_CHAT_ID]['chat_name']}'"
                 )
+        else:
+            update.callback_query.message.reply_text(
+                text=f"Выбран текущий чат поддержки: '{chats[TARGET_CHAT_ID]['chat_name']}'"
+            ) 
         context.user_data["waiting_for_support_chat"] = False
     #     new_question, created = Question.add_question(update=update, context=context)
     #     if created:
