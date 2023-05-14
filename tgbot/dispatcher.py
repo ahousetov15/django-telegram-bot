@@ -7,6 +7,8 @@ from telegram.ext import (
     CommandHandler,
     MessageHandler,
     CallbackQueryHandler,
+    ContextTypes,
+    ConversationHandler
 )
 
 from dtb.settings import DEBUG
@@ -23,56 +25,126 @@ from tgbot.handlers.status_update import handlers as status_update_handlers
 from tgbot.handlers.message import handlers as message_handlers
 from tgbot.handlers.chats import handlers as chats_handlers
 from tgbot.main import bot
+from tgbot.states import (
+    SELECTING_ACTION, 
+    ASK_QUESTION,
+    QUESTION,
+    ASKING_QUESTION,
+    HELP, 
+    EXPORT_QUESTIONS, 
+    SUPPORT_CHAT,
+    STOP_BOT, 
+    SELECTING_LEVEL, 
+    SELECTING_SUPPORT_CHAT, 
+    SELECT_STOP_BOT, 
+    SELECT_STOP_AND_REMOVE_ALL,
+    SELECTING_FEATURE, 
+    TYPING, 
+    STOPPING, 
+    SHOWING, 
+    END,
+    HAS_QUESTION
+)
 
 
 def setup_dispatcher(dp):
     """
     Adding handlers for events from Telegram
     """
-    # onboarding
-    dp.add_handler(CommandHandler("start", onboarding_handlers.command_start))
+    # invite or leave chat handlers
+    # dp.add_handler(
+    #     MessageHandler(
+    #         Filters.status_update.new_chat_members,
+    #         status_update_handlers.add_bot_to_chat,
+    #     )
+    # )
+    # dp.add_handler(
+    #     MessageHandler(
+    #         Filters.status_update.left_chat_member,
+    #         status_update_handlers.remove_bot_from_chat,
+    #     )
+    # )
+
+    ask_question_conv = ConversationHandler(
+        entry_points=[
+            CallbackQueryHandler(
+                message_handlers.ask_question, pattern="^" + str(ASK_QUESTION) + "$"
+            )
+        ],
+        states={
+            ASKING_QUESTION: [
+                CallbackQueryHandler(message_handlers.asking_question, pattern="^" + str(TYPING) + "$")
+            ],
+            HAS_QUESTION: [MessageHandler(Filters.text, message_handlers.handle_only_message)],
+            TYPING: [MessageHandler(Filters.text, message_handlers.handle_only_message)],
+        },
+        fallbacks=[
+            CallbackQueryHandler(message_handlers.end_describing, pattern="^" + str(END) + "$"),
+            CommandHandler("stop", onboarding_handlers.stop_nested),
+        ],
+        map_to_parent={
+            # Return to second level menu
+            END: SELECTING_ACTION,
+            # End conversation altogether
+            STOPPING: STOPPING,
+        },
+    )
+
+    selection_handlers = [
+        CallbackQueryHandler(message_handlers.ask_question_button_press, pattern="^" + str(QUESTION) + "$"),
+        # CallbackQueryHandler(message_handlers.export_questions, pattern="^" + str(EXPORT_QUESTIONS) + "$"),
+        # CallbackQueryHandler(onboarding_handlers.end, pattern="^" + str(END) + "$"),
+    ]
+
+    conv_handler = ConversationHandler(
+        entry_points=[CommandHandler("start", onboarding_handlers.command_start)],
+        states={
+            SHOWING: [CallbackQueryHandler(onboarding_handlers.command_start, pattern="^" + str(END) + "$")],
+            SELECTING_ACTION: selection_handlers,
+            SELECTING_LEVEL: selection_handlers,
+            QUESTION: [ask_question_conv],
+            STOPPING: [CommandHandler("start", onboarding_handlers.command_start)],
+        },
+        fallbacks=[CommandHandler("stop", onboarding_handlers.stop)],
+    )
+
+    dp.add_handler(conv_handler)
+
+
+    # # onboarding
+    # dp.add_handler(CommandHandler("start", onboarding_handlers.command_start))
 
     # admin commands
-    dp.add_handler(CommandHandler("admin", admin_handlers.admin))
+    # dp.add_handler(CommandHandler("admin", admin_handlers.admin))
     # dp.add_handler(CommandHandler("stats", admin_handlers.stats))
     # dp.add_handler(CommandHandler('export_users', admin_handlers.export_users))
 
     # processing msg or questions
-    dp.add_handler(
-        MessageHandler(Filters.text, message_handlers.handle_message_or_question)
-    )
+    # dp.add_handler(
+    #     MessageHandler(Filters.text, message_handlers.handle_message_or_question)
+    # )
 
-    # invite or leave chat handlers
-    dp.add_handler(
-        MessageHandler(
-            Filters.status_update.new_chat_members,
-            status_update_handlers.add_bot_to_chat,
-        )
-    )
-    dp.add_handler(
-        MessageHandler(
-            Filters.status_update.left_chat_member,
-            status_update_handlers.remove_bot_from_chat,
-        )
-    )
-    dp.add_handler(
-        CallbackQueryHandler(message_handlers.ask_question, pattern="^ask_question$")
-    )
-    dp.add_handler(
-        CallbackQueryHandler(
-            message_handlers.export_questions, pattern="^export_questions$"
-        )
-    )
-    dp.add_handler(
-        CallbackQueryHandler(
-            chats_handlers.list_sup_chat, pattern="^list_sup_chat"
-        )
-    )
-    dp.add_handler(
-        CallbackQueryHandler(
-            chats_handlers.handle_support_chat, pattern="^support_chat_.*", pass_user_data=True
-        )
-    )
+
+    # dp.add_handler(
+    #     CallbackQueryHandler(message_handlers.ask_question, pattern="^ask_question$")
+    # )
+    # dp.add_handler(
+    #     CallbackQueryHandler(
+    #         message_handlers.export_questions, pattern="^export_questions$"
+    #     )
+    # )
+    # dp.add_handler(
+    #     CallbackQueryHandler(
+    #         chats_handlers.list_sup_chat, pattern="^list_sup_chat"
+    #     )
+    # )
+    # dp.add_handler(
+    #     CallbackQueryHandler(
+    #         chats_handlers.handle_support_chat, pattern="^support_chat_.*", pass_user_data=True
+    #     )
+    # )
+
+    # ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
     # # location
     # dp.add_handler(CommandHandler("ask_location", location_handlers.ask_for_location))
     # dp.add_handler(MessageHandler(Filters.location, location_handlers.location_handler))
