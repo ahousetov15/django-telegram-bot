@@ -68,18 +68,21 @@ def setup_dispatcher(dp):
     ask_question_conv = ConversationHandler(
         entry_points=[
             CallbackQueryHandler(
-                message_handlers.ask_question, pattern="^" + str(ASK_QUESTION) + "$"
+                message_handlers.asking_question, pattern="^" + str(ASKING_QUESTION) + "$"
             )
         ],
         states={
+            # ASK_QUESTION: [
+            #     CallbackQueryHandler(message_handlers.ask_question, pattern="^" + str(ASK_QUESTION) + "$")
+            # ],
             ASKING_QUESTION: [
-                CallbackQueryHandler(message_handlers.asking_question, pattern="^" + str(TYPING) + "$")
+                CallbackQueryHandler(message_handlers.asking_question, pattern="^" + str(ASKING_QUESTION) + "$")
             ],
-            HAS_QUESTION: [MessageHandler(Filters.text, message_handlers.handle_only_message)],
-            TYPING: [MessageHandler(Filters.text, message_handlers.handle_only_message)],
+            # HAS_QUESTION: [MessageHandler(Filters.text, message_handlers.handle_only_questions)],
+            TYPING: [MessageHandler(Filters.text, message_handlers.handle_only_questions)],
         },
         fallbacks=[
-            CallbackQueryHandler(message_handlers.end_describing, pattern="^" + str(END) + "$"),
+            CallbackQueryHandler(message_handlers.end_asking_question, pattern="^" + str(END) + "$"),
             CommandHandler("stop", onboarding_handlers.stop_nested),
         ],
         map_to_parent={
@@ -105,7 +108,10 @@ def setup_dispatcher(dp):
             QUESTION: [ask_question_conv],
             STOPPING: [CommandHandler("start", onboarding_handlers.command_start)],
         },
-        fallbacks=[CommandHandler("stop", onboarding_handlers.stop)],
+        fallbacks=[
+            CallbackQueryHandler(message_handlers.end_asking_question, pattern="^" + str(END) + "$"), 
+            CommandHandler("stop", onboarding_handlers.stop)
+        ],
     )
 
     dp.add_handler(conv_handler)

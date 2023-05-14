@@ -31,10 +31,14 @@ def command_start(update: Update, context: CallbackContext) -> None:
         text = static_text.start_not_created_ru.format(first_name=u.first_name)
     
         
-
-    update.message.reply_text(text=text,
-                              reply_markup=make_keyboard_for_start_command())
+    if context.user_data.get(START_OVER):
+        update.callback_query.answer()
+        update.callback_query.edit_message_text(text=text, reply_markup=make_keyboard_for_start_command())
+    else:
+        update.message.reply_text(text=text,
+                                  reply_markup=make_keyboard_for_start_command())
     
+    context.user_data[START_OVER] = False
     return SELECTING_ACTION
 
 

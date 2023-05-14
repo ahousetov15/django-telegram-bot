@@ -8,43 +8,46 @@ from utils.models import datetime_str
 from tgbot.handlers.utils.info import send_typing_action
 from tgbot.handlers.admin import static_text
 from tgbot.handlers.onboarding import handlers as onboarding_handlers
-from tgbot.states import ASK_QUESTION, ASKING_QUESTION, HAS_QUESTION, QUESTION, START_OVER, TYPING, END
+from tgbot.states import ASK_QUESTION, ASKING_QUESTION, HAS_QUESTION, QUESTION, START_OVER, TYPING, END, CURRENT_LEVEL
 
 
 def ask_question_button_press(update: Update, context: CallbackContext) -> str:
-    text = 'Вы можете задать вопросы ведущему. Они будут сохранены и вы получите ответ, когда ведущий освободиться.'
-    button = InlineKeyboardButton(text='Задать вопросы', callback_data=str(ASK_QUESTION))
+    context.user_data[CURRENT_LEVEL] = QUESTION
+    message_text = 'Вы можете задать вопросы ведущему. Они будут сохранены и вы получите ответ, когда ведущий освободиться.'
+    button = InlineKeyboardButton(text='Задать вопросы', callback_data=str(ASKING_QUESTION))
     keyboard = InlineKeyboardMarkup.from_button(button)
 
     update.callback_query.answer()
-    update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
+    update.callback_query.edit_message_text(text=message_text, reply_markup=keyboard)
     return QUESTION 
 
 
-def ask_question(update: Update, context: CallbackContext) -> str:
-    """Select a feature to update for the person."""
-    buttons = [
-        [
-            InlineKeyboardButton(text="Задать вопрос.", callback_data=str(HAS_QUESTION)),
-            InlineKeyboardButton(text="Нет вопросов.", callback_data=str(END)),
-        ]
-    ]
-    keyboard = InlineKeyboardMarkup(buttons)
+# def ask_question(update: Update, context: CallbackContext) -> str:
+#     """Select a feature to update for the person."""
+#     buttons = [
+#         [
+#             InlineKeyboardButton(text="Задать вопрос.", callback_data=str(ASKING_QUESTION)),
+#             InlineKeyboardButton(text="Нет вопросов.", callback_data=str(END)),
+#         ]
+#     ]
+#     keyboard = InlineKeyboardMarkup(buttons)
 
-    # If we collect features for a new person, clear the cache and save the gender
-    if not context.user_data.get(START_OVER):
-        # context.user_data[FEATURES] = {GENDER: update.callback_query.data}
-        text = "У вас есть вопрос?"
+#     # If we collect features for a new person, clear the cache and save the gender
+#     if not context.user_data.get(START_OVER):
+#         # context.user_data[FEATURES] = {GENDER: update.callback_query.data}
+#         # text = "У вас есть вопрос?"
 
-        update.callback_query.answer()
-        update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
-    # But after we do that, we need to send a new message
-    else:
-        text = "Отлично! Остались вопросы?"
-        update.message.reply_text(text=text, reply_markup=keyboard)
+#         # update.callback_query.answer()
+#         # update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
+#         return asking_question(update, context) 
+#     # But after we do that, we need to send a new message
+#     else:
+#         text = "Отлично! Остались вопросы?"
+#         update.message.reply_text(text=text, reply_markup=keyboard)
 
-    context.user_data[START_OVER] = False
-    return ASKING_QUESTION
+
+#     context.user_data[START_OVER] = False
+#     return ASKING_QUESTION
 
 
 def asking_question(update: Update, context: CallbackContext) -> str:
@@ -103,7 +106,7 @@ def notification_formatting(update: Update):
     return result
 
 
-def handle_only_message(update: Update, context: CallbackContext):
+def handle_only_questions(update: Update, context: CallbackContext) -> str:
     TARGET_CHAT_ID = Chats.get_support_chat_id()
     if (
         "waiting_for_question" in context.user_data
@@ -122,17 +125,24 @@ def handle_only_message(update: Update, context: CallbackContext):
                     message=notification_formatting(update=update),
                 )
 
-            update.message.reply_text(
-                text="Ваш вопрос был успешно отправлен.",
-                reply_to_message_id=update.message.message_id,
-            )
+            context.user_data[START_OVER] = True
+            text="Ваш вопрос был успешно отправлен. У вас остались вопросы?"
         else:
-            update.message.reply_text(
-                text="По какой-то причине, ваш запрос не отправлен.",
-                reply_to_message_id=update.message.message_id,
-            )
-        context.user_data["waiting_for_question"] = False
+            text="По какой-то причине, ваш запрос не отправлен."
 
+        buttons = [
+            [
+                InlineKeyboardButton(text="Задать вопрос.", callback_data=str(ASKING_QUESTION)),
+                InlineKeyboardButton(text="Нет вопросов.", callback_data=str(END)),
+            ]
+        ]
+        keyboard = InlineKeyboardMarkup(buttons)
+        update.message.reply_text(
+            text=text, 
+            reply_to_message_id=update.message.message_id,
+            reply_markup=keyboard)
+        context.user_data["waiting_for_question"] = False
+    return ASKING_QUESTION
 
 
 def handle_message_or_question(update: Update, context: CallbackContext):
@@ -181,19 +191,19 @@ def handle_message_or_question(update: Update, context: CallbackContext):
             )
 
 
-async def end_describing(update: Update, context: CallbackContext) -> int:
+def end_asking_question(update: Update, context: CallbackContext) -> int:
     """End gathering of features and return to parent conversation."""
     user_data = context.user_data
-    # level = user_data[CURRENT_LEVEL]
+    level = user_data[CURRENT_LEVEL]
     # if not user_data.get(level):
     #     user_data[level] = []
     # user_data[level].append(user_data[FEATURES])
 
     # Print upper level menu
-    # if level == SELF:
-    #     user_data[START_OVER] = True
-    onboarding_handlers.command_start(update, context)
-    # else:
-    #     await select_level(update, context)
+    if level == QUESTION:
+        user_data[START_OVER] = True
+        onboarding_handlers.command_start(update, context)
+    else:
+        asking_question(update, context)
 
     return END
