@@ -10,8 +10,10 @@ def make_keyboard_for_start_command() -> InlineKeyboardMarkup:
         # InlineKeyboardButton(github_button_text, url="https://github.com/ohld/django-telegram-bot"),
         # InlineKeyboardButton(secret_level_button_text, callback_data=f'{SECRET_LEVEL_BUTTON}'),
         InlineKeyboardButton("Вопросы", callback_data=str(QUESTION)),
-        InlineKeyboardButton("Получить вопросы", callback_data=str(EXPORT_QUESTIONS)),
         InlineKeyboardButton("Чат поддержки", callback_data=str(SUPPORT_CHAT))
+    ],
+    [
+        InlineKeyboardButton("Получить вопросы", callback_data=str(EXPORT_QUESTIONS)),
     ],
     [
         InlineKeyboardButton("Закончить", callback_data=str(END))

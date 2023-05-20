@@ -118,6 +118,13 @@ class User(CreateUpdateTracker):
         return u, created
 
     @classmethod
+    def get_users_id(cls) -> List[int]:
+        all_users = cls.objects.all().values()
+        users_id_list = [user["user_id"] for user in all_users]
+        return users_id_list
+
+
+    @classmethod
     def get_user(cls, update: Update, context: CallbackContext) -> User:
         u, _ = cls.get_user_and_created(update, context)
         return u
