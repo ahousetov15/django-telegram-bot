@@ -1,8 +1,8 @@
 import datetime
 
 from django.utils import timezone
-from telegram import ParseMode, Update
-from telegram.ext import CallbackContext, ContextTypes
+from telegram import ParseMode, Update, KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove
+from telegram.ext import CallbackContext, ContextTypes, ConversationHandler
 from tgbot.states import *
 from tgbot.handlers.onboarding import static_text
 from tgbot.handlers.utils.info import extract_user_data_from_update
@@ -30,33 +30,42 @@ def command_start(update: Update, context: CallbackContext) -> None:
     else:
         text = static_text.start_not_created_ru.format(first_name=u.first_name)
     
-        
+
     if context.user_data.get(START_OVER):
         update.callback_query.answer()
         update.callback_query.edit_message_text(text=text, reply_markup=make_keyboard_for_start_command())
     else:
+        context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="Начинаю работу бота.",
+            reply_markup=ReplyKeyboardRemove()
+        )  
         update.message.reply_text(text=text,
                                   reply_markup=make_keyboard_for_start_command())
-    
+
     context.user_data[START_OVER] = False
     return SELECTING_ACTION
 
 
-def stop(update: Update, context: CallbackContext) -> int:
+def stop_main_conv(update: Update, context: CallbackContext) -> int:
     """End Conversation by command."""
-    update.message.reply_text("Okay, bye.")
+    # update.message.reply_text("До встречи!")
+    keyboard = [
+        [KeyboardButton("/start")]
+    ]
+    reply_markup = ReplyKeyboardMarkup(keyboard)
+    context.bot.send_message(chat_id=update.effective_chat.id, text="До встречи!", reply_markup=reply_markup)
+    return ConversationHandler.END
 
-    return END
 
+# def end_buttton_clicked(update: Update, context: CallbackContext) -> int:
+#     """End conversation from InlineKeyboardButton."""
+#     # update.callback_query.answer()
 
-def end(update: Update, context: CallbackContext) -> int:
-    """End conversation from InlineKeyboardButton."""
-    update.callback_query.answer()
-
-    text = "See you around!"
-    update.callback_query.edit_message_text(text=text)
-
-    return END
+#     # text = "See you around!"
+#     # update.callback_query.edit_message_text(text=text)
+#     context.bot.send_message(chat_id=update.effective_chat.id, text="/stop")
+#     # return END
 
 
 def stop_nested(update: Update, context: CallbackContext) -> str:

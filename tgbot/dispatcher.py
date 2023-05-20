@@ -86,7 +86,7 @@ def setup_dispatcher(dp):
             CommandHandler("stop", onboarding_handlers.stop_nested),
         ],
         map_to_parent={
-            # Return to second level menu
+            # Возвращаемся к основному диалогу.
             END: SELECTING_ACTION,
             # End conversation altogether
             STOPPING: STOPPING,
@@ -109,8 +109,8 @@ def setup_dispatcher(dp):
             STOPPING: [CommandHandler("start", onboarding_handlers.command_start)],
         },
         fallbacks=[
-            CallbackQueryHandler(message_handlers.end_asking_question, pattern="^" + str(END) + "$"), 
-            CommandHandler("stop", onboarding_handlers.stop)
+            CallbackQueryHandler(onboarding_handlers.stop_main_conv, pattern="^" + str(END) + "$"), 
+            CommandHandler("stop", onboarding_handlers.stop_main_conv)
         ],
     )
 

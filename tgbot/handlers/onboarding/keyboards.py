@@ -14,7 +14,7 @@ def make_keyboard_for_start_command() -> InlineKeyboardMarkup:
         InlineKeyboardButton("Чат поддержки", callback_data=str(SUPPORT_CHAT))
     ],
     [
-        InlineKeyboardButton("Закончить", callback_data="/stop")
+        InlineKeyboardButton("Закончить", callback_data=str(END))
     ]
     ]
 
