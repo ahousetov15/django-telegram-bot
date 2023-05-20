@@ -27,7 +27,6 @@ from tgbot.handlers.chats import handlers as chats_handlers
 from tgbot.main import bot
 from tgbot.states import (
     SELECTING_ACTION, 
-    ASK_QUESTION,
     QUESTION,
     ASKING_QUESTION,
     HELP, 

@@ -32,7 +32,7 @@ def run_polling(tg_token: str = TELEGRAM_TOKEN):
     reply_markup = ReplyKeyboardMarkup(keyboard)
     users_id_list = User.get_users_id()
     for user_id in users_id_list:
-        Bot.send_message(chat_id=user_id, text=welcome_message, reply_markup=reply_markup)
+        dp.bot.send_message(chat_id=user_id, text=welcome_message, reply_markup=reply_markup)
     # bot.send_message(text='👋', chat_id=<YOUR TELEGRAM ID>)
 
     updater.start_polling()
