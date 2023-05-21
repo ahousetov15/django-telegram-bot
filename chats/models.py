@@ -31,7 +31,7 @@ class Chats(models.Model):
 
     @classmethod
     def chats_to_dict(cls):
-        bot_chats = cls.objects.all().values()
+        bot_chats = cls.objects.all().order_by("chat_name").values()
         bot_chat_dict = {
             chat["chat_id"]: {
                 "chat_name": chat["chat_name"],
@@ -84,7 +84,7 @@ class Chats(models.Model):
         cls, update: Update, context: CallbackContext
     ) -> Tuple[Union[str, None], Union[dict, None]]:
         """Если бот удалили(удалился) из чата, нужно убраться его из БД"""
-        removed = None
+        removed = None, None
         chat_id = update.message.chat_id
         bot_chats = cls.chats_to_dict()
         if update.message.left_chat_member.username == TELEGRAM_BOT_USERNAME:

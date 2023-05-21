@@ -53,18 +53,18 @@ def setup_dispatcher(dp):
     Adding handlers for events from Telegram
     """
     # invite or leave chat handlers
-    # dp.add_handler(
-    #     MessageHandler(
-    #         Filters.status_update.new_chat_members,
-    #         status_update_handlers.add_bot_to_chat,
-    #     )
-    # )
-    # dp.add_handler(
-    #     MessageHandler(
-    #         Filters.status_update.left_chat_member,
-    #         status_update_handlers.remove_bot_from_chat,
-    #     )
-    # )
+    dp.add_handler(
+        MessageHandler(
+            Filters.status_update.new_chat_members,
+            status_update_handlers.add_bot_to_chat,
+        )
+    )
+    dp.add_handler(
+        MessageHandler(
+            Filters.status_update.left_chat_member,
+            status_update_handlers.remove_bot_from_chat,
+        )
+    )
 
     support_chats_conv = ConversationHandler(
         entry_points=[
@@ -81,7 +81,8 @@ def setup_dispatcher(dp):
             SELECT_SUPPORT_CHAT: [
                 CallbackQueryHandler(
                     chats_handlers.handle_support_chat,
-                    pattern=f"^{SUPPORT_CHAT_AND_NUMBER}", pass_user_data=True
+                    pattern=f"^{SUPPORT_CHAT_AND_NUMBER}",
+                    pass_user_data=True,
                 )
             ],
         },
@@ -102,8 +103,8 @@ def setup_dispatcher(dp):
     ask_question_conv = ConversationHandler(
         entry_points=[
             CallbackQueryHandler(
-                message_handlers.asking_question,
-                pattern="^" + str(ASKING_QUESTION) + "$",
+                message_handlers.ask_question_button_press,
+                pattern="^" + str(QUESTION) + "$",
             )
         ],
         states={
@@ -132,20 +133,10 @@ def setup_dispatcher(dp):
     )
 
     selection_handlers = [
-        CallbackQueryHandler(
-            message_handlers.ask_question_button_press,
-            pattern="^" + str(QUESTION) + "$",
-        ),
-        # CallbackQueryHandler(
-        #     chats_handlers.support_chat_button_press,
-        #     pattern="^" + str(SUPPORT_CHAT) + "$",
-        # ),
-        CallbackQueryHandler(
-            chats_handlers.support_chat_button_press,
-            pattern="^" + str(SUPPORT_CHAT) + "$",
-        )
-        # CallbackQueryHandler(message_handlers.export_questions, pattern="^" + str(EXPORT_QUESTIONS) + "$"),
-        # CallbackQueryHandler(onboarding_handlers.end, pattern="^" + str(END) + "$"),
+        ask_question_conv,
+        support_chats_conv,
+        CallbackQueryHandler(message_handlers.export_questions, pattern="^" + str(EXPORT_QUESTIONS) + "$"),
+        CallbackQueryHandler(onboarding_handlers.end_buttton_clicked, pattern="^" + str(END) + "$"),
     ]
 
     conv_handler = ConversationHandler(
@@ -172,8 +163,6 @@ def setup_dispatcher(dp):
 
     dp.add_handler(conv_handler)
 
-    # # onboarding
-    # dp.add_handler(CommandHandler("start", onboarding_handlers.command_start))
 
     # admin commands
     # dp.add_handler(CommandHandler("admin", admin_handlers.admin))
@@ -181,28 +170,10 @@ def setup_dispatcher(dp):
     # dp.add_handler(CommandHandler('export_users', admin_handlers.export_users))
 
     # processing msg or questions
-    # dp.add_handler(
-    #     MessageHandler(Filters.text, message_handlers.handle_message_or_question)
-    # )
+    dp.add_handler(
+        MessageHandler(Filters.text, message_handlers.handle_message_or_question)
+    )
 
-    # dp.add_handler(
-    #     CallbackQueryHandler(message_handlers.ask_question, pattern="^ask_question$")
-    # )
-    # dp.add_handler(
-    #     CallbackQueryHandler(
-    #         message_handlers.export_questions, pattern="^export_questions$"
-    #     )
-    # )
-    # dp.add_handler(
-    #     CallbackQueryHandler(
-    #         chats_handlers.list_sup_chat, pattern="^list_sup_chat"
-    #     )
-    # )
-    # dp.add_handler(
-    #     CallbackQueryHandler(
-    #         chats_handlers.handle_support_chat, pattern="^support_chat_.*", pass_user_data=True
-    #     )
-    # )
 
     # //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     # # location

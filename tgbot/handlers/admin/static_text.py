@@ -9,3 +9,4 @@ users_amount_stat = "<b>Users</b>: {user_count}\n" \
                     "<b>24h active</b>: {active_24}"
 
 welcome_message = f"Добро пожаловать!\n\n Для начала работы нажмите на кнопку '/start' или ввидите команду вручную."
+no_questions = f"На данный момент, вопросов нет."

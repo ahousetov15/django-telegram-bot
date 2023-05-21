@@ -1,5 +1,5 @@
 from __future__ import annotations
-
+import logging
 from typing import Union, Optional, Tuple, List
 from django.db import models
 from django.db.models import QuerySet, Manager
@@ -21,7 +21,7 @@ class User(CreateUpdateTracker):
         primary_key=True, verbose_name="Номер пользователя"
     )  # telegram_id
     username = models.CharField(max_length=32, **nb, verbose_name="Никнейм")
-    first_name = models.CharField(max_length=256, verbose_name="Имя")
+    first_name = models.CharField(max_length=256, **nb, verbose_name="Имя")
     last_name = models.CharField(max_length=256, **nb, verbose_name="Фамилия")
     language_code = models.CharField(
         max_length=8,
@@ -144,7 +144,10 @@ class User(CreateUpdateTracker):
     def send_welcome_message_and_keyboard_to_all(cls, bot: Bot):
         users_id_list = User.get_users_id()
         for user_id in users_id_list:
-            bot.send_message(chat_id=user_id, text=welcome_message, reply_markup=welcome_user_keyboard())
+            try:
+                bot.send_message(chat_id=user_id, text=welcome_message, reply_markup=welcome_user_keyboard())
+            except Exception as e:
+                logging.error(f"Пользователь с id={user_id} возможно не авторизован. Невозможно начать с ним беседу.", exc_info=str(e))
 
     @classmethod
     def get_user_by_username_or_user_id(

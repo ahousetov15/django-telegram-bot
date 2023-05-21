@@ -14,12 +14,18 @@ from tgbot.states import ASK_QUESTION, ASKING_QUESTION, HAS_QUESTION, QUESTION, 
 def ask_question_button_press(update: Update, context: CallbackContext) -> str:
     context.user_data[CURRENT_LEVEL] = QUESTION
     message_text = 'Вы можете задать вопросы ведущему. Они будут сохранены и вы получите ответ, когда ведущий освободиться.'
-    button = InlineKeyboardButton(text='Задать вопросы', callback_data=str(ASKING_QUESTION))
-    keyboard = InlineKeyboardMarkup.from_button(button)
+    buttons = [
+        [
+            InlineKeyboardButton(text='Задать вопросы', callback_data=str(ASKING_QUESTION)),
+            InlineKeyboardButton(text='Назад', callback_data=str(END))
+        ]
+    ]
+    keyboard = InlineKeyboardMarkup(buttons)
 
     update.callback_query.answer()
     update.callback_query.edit_message_text(text=message_text, reply_markup=keyboard)
-    return QUESTION 
+    # return QUESTION 
+    return ASKING_QUESTION 
 
 
 # def ask_question(update: Update, context: CallbackContext) -> str:
@@ -66,16 +72,22 @@ def asking_question(update: Update, context: CallbackContext) -> str:
 
 @send_typing_action
 def export_questions(update: Update, context: CallbackContext):
-    file_name, excel_questions = Question.export_question_to_excel()
-
+    file_name, excel_questions, count, first_date, last_date  = Question.export_question_to_excel()
+    removed = Question.remove_question()
     u = User.get_user(update, context)
     if not u.is_admin:
         update.message.reply_text(static_text.only_for_admins_ru)
         return
-    with excel_questions as file:
-        context.bot.send_document(
-            chat_id=u.user_id, document=InputFile(file, filename=file_name)
-        )
+    if excel_questions:
+        with excel_questions as file:
+            caption = f"Всего вопросов: {count}\nДата первого вопроса: {first_date}\nДата последнего вопроса: {last_date}\n\n"
+            context.bot.send_document(
+                chat_id=u.user_id, 
+                document=InputFile(file, filename=file_name),
+                caption=caption
+            )
+    else:
+        context.bot.send_message(chat_id=u.user_id, text=file_name)
 
 
 def question_formatting(update: Update):

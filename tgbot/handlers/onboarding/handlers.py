@@ -58,14 +58,14 @@ def stop_main_conv(update: Update, context: CallbackContext) -> int:
     return ConversationHandler.END
 
 
-# def end_buttton_clicked(update: Update, context: CallbackContext) -> int:
-#     """End conversation from InlineKeyboardButton."""
-#     # update.callback_query.answer()
+def end_buttton_clicked(update: Update, context: CallbackContext) -> int:
+    """End conversation from InlineKeyboardButton."""
+    # update.callback_query.answer()
 
-#     # text = "See you around!"
-#     # update.callback_query.edit_message_text(text=text)
-#     context.bot.send_message(chat_id=update.effective_chat.id, text="/stop")
-#     # return END
+    # text = "See you around!"
+    # update.callback_query.edit_message_text(text=text)
+    # context.bot.send_message(chat_id=update.effective_chat.id, text="/stop")
+    return END
 
 
 def stop_nested(update: Update, context: CallbackContext) -> str:

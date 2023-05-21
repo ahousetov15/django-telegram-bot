@@ -22,13 +22,11 @@ from tgbot.handlers.onboarding import handlers as onboarding_handlers
 def support_chat_button_press(update: Update, context: CallbackContext) -> str:
     context.user_data[CURRENT_LEVEL] = SUPPORT_CHAT
     message_text = 'Бот устанавливает чаты поддержки: то куда пересылаются сообщения пользователей, для оперативной обратной связи.'
-    # button = InlineKeyboardButton(text='Установить чат поддержки', callback_data=str(SUPPORT_CHAT))
     buttons = [
         [
             InlineKeyboardButton(text="Установить чат поддержки.", callback_data=str(SUPPORT_CHAT)),
         ]
     ]
-    # keyboard = InlineKeyboardMarkup.from_button(button)
     keyboard = InlineKeyboardMarkup(buttons)
     update.callback_query.answer()
     update.callback_query.edit_message_text(text=message_text, reply_markup=keyboard)
@@ -36,6 +34,7 @@ def support_chat_button_press(update: Update, context: CallbackContext) -> str:
  
 
 def list_sup_chat(update: Update, context: CallbackContext):
+    context.user_data[CURRENT_LEVEL] = SUPPORT_CHAT
     query = update.callback_query
     chats = Chats.chats_to_dict()
     support_chat = Chats.get_support_chat_id()

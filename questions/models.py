@@ -10,6 +10,8 @@ from telegram import Update
 from telegram.ext import CallbackContext
 from utils.models import CreateTracker, datetime_str
 from typing import Tuple
+from tgbot.handlers.admin.static_text import no_questions
+
 
 QUESTION_MAX_LENGTH = 100
 
@@ -33,12 +35,37 @@ class Question(CreateTracker):
             msg_id=update.message.message_id, user=user, text=update.message.text
         )
         return new_question, created
+    
+    @classmethod
+    def remove_question(cls, msg_id = None) -> int:
+        if msg_id:
+            question_for_remove = cls.objects.get(msg_id)
+        else:
+            question_for_remove = cls.objects.all()
+        count = question_for_remove.count()
+        question_for_remove.delete()
+        return count
 
-    def generate_excel_file_name(queryset: QuerySet):
+    @classmethod
+    def questions_meta(cls, queryset: QuerySet) -> Tuple[int, str, str]:
         count = str(queryset.count())
-        first_date, last_date = datetime_str(queryset.first().created_at), datetime_str(
-            queryset.last().created_at
-        )
+        if count == '0':
+           first_date, last_date = "", ""
+        else:
+            first_date, last_date = datetime_str(queryset.first().created_at), datetime_str(
+                queryset.last().created_at
+            ) 
+        return count, first_date, last_date
+
+    @classmethod
+    def generate_excel_file_name(cls, queryset: QuerySet):
+        # count = str(queryset.count())
+        # first_date, last_date = datetime_str(queryset.first().created_at), datetime_str(
+        #     queryset.last().created_at
+        # )
+        count, first_date, last_date = cls.questions_meta(queryset)
+        if count == 0:
+           excel_file_name = "На " 
         if count.endswith("1"):
             question_numerals = "вопрос"
         elif count.endswith(
@@ -72,13 +99,15 @@ class Question(CreateTracker):
         return "\n".join(lines)
 
     @classmethod
-    def export_question_to_excel(cls) -> Tuple[str, File]:
+    def export_question_to_excel(cls) -> Tuple[str, File, int, str, str]:
         questions = cls.objects.all()
-
+        questions_count, first_date, last_date = cls.questions_meta(questions)
+        if questions_count == "0":
+            excel_file_name = no_questions
+            return excel_file_name, None, questions_count, first_date, last_date 
         workbook = openpyxl.Workbook()
         worksheet = workbook.active
         worksheet.title = cls.generate_excel_file_name(questions)
-
         # Определение стилей
         bold_font = Font(bold=True, size=16)
         big_font = Font(bold=False, size=16)
@@ -186,4 +215,5 @@ class Question(CreateTracker):
         excel_file = BytesIO()
         workbook.save(excel_file)
         excel_file.seek(0)
-        return f"{worksheet.title}.xlsx", excel_file
+        excel_file_name = f"{worksheet.title}.xlsx"
+        return excel_file_name, excel_file, questions_count, first_date, last_date
