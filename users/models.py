@@ -3,12 +3,13 @@ from __future__ import annotations
 from typing import Union, Optional, Tuple, List
 from django.db import models
 from django.db.models import QuerySet, Manager
-from telegram import Update
+from telegram import Update, Bot
 from telegram.ext import CallbackContext
 from tgbot.handlers.utils.info import extract_user_data_from_update, extract_new_chat_members_from_update
 from utils.models import CreateUpdateTracker, nb, CreateTracker, GetOrNoneManager
 from dtb.settings import ADMINS_BY_DEFAULT
-
+from tgbot.handlers.admin.static_text import welcome_message
+from keyboards import welcome_user_keyboard
 
 class AdminUserManager(Manager):
     def get_queryset(self):
@@ -63,7 +64,6 @@ class User(CreateUpdateTracker):
 
 
     @classmethod
-    # def add_incoming_user(cls, update: Update, context: CallbackContext) -> List[User]:
     def add_incoming_user(cls, update: Update, context: CallbackContext):
         data_list = extract_new_chat_members_from_update(update)
         # created_users = []
@@ -86,6 +86,7 @@ class User(CreateUpdateTracker):
                     ):  # you can't invite yourself
                         u.deep_link = payload
                 u.save()
+                User.send_welcome_message_and_keyboard(user=u, update=update, context=context)
                 # created_users.append(u)
         # return created_users
 
@@ -134,6 +135,16 @@ class User(CreateUpdateTracker):
         if admins_dict := cls.get_admins_dict():
             for admin_chat_id, admin_values in admins_dict.items():
                 context.bot.send_message(chat_id=admin_chat_id, text=message)
+
+    @classmethod
+    def send_welcome_message_and_keyboard(cls, user: User, update: Update, context: CallbackContext):
+        context.bot.send_message(chat_id=user.user_id, text=welcome_message, reply_markup=welcome_user_keyboard)
+
+    @classmethod
+    def send_welcome_message_and_keyboard_to_all(cls, bot: Bot):
+        users_id_list = User.get_users_id()
+        for user_id in users_id_list:
+            bot.send_message(chat_id=user_id, text=welcome_message, reply_markup=welcome_user_keyboard)
 
     @classmethod
     def get_user_by_username_or_user_id(

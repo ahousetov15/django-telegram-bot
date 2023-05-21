@@ -10,6 +10,7 @@ from dtb.settings import TELEGRAM_TOKEN, TELEGRAM_BOT_USERNAME
 from tgbot.dispatcher import setup_dispatcher
 from tgbot.handlers.admin.static_text import welcome_message
 from users.models import User
+from tgbot.states import ACTIVATE
 
 def run_polling(tg_token: str = TELEGRAM_TOKEN):
     """ Run bot in polling mode """
@@ -24,15 +25,7 @@ def run_polling(tg_token: str = TELEGRAM_TOKEN):
     print(f"Polling of '{bot_link}' has started")
     # it is really useful to send '👋' emoji to developer
     # when you run local test
-    
-    # update.message.reply_text("До встречи!")
-    keyboard = [
-        [KeyboardButton("/start")]
-    ]
-    reply_markup = ReplyKeyboardMarkup(keyboard)
-    users_id_list = User.get_users_id()
-    for user_id in users_id_list:
-        dp.bot.send_message(chat_id=user_id, text=welcome_message, reply_markup=reply_markup)
+    User.send_welcome_message_and_keyboard_to_all(dp.bot)
     # bot.send_message(text='👋', chat_id=<YOUR TELEGRAM ID>)
 
     updater.start_polling()

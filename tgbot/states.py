@@ -1,5 +1,5 @@
 START_OVER = False
-
+ACTIVATE = False
 (
     ASK_QUESTION,
     ASKING_QUESTION,
