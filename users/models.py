@@ -9,7 +9,7 @@ from tgbot.handlers.utils.info import extract_user_data_from_update, extract_new
 from utils.models import CreateUpdateTracker, nb, CreateTracker, GetOrNoneManager
 from dtb.settings import ADMINS_BY_DEFAULT
 from tgbot.handlers.admin.static_text import welcome_message
-from keyboards import welcome_user_keyboard
+from .keyboards import welcome_user_keyboard
 
 class AdminUserManager(Manager):
     def get_queryset(self):
@@ -138,13 +138,13 @@ class User(CreateUpdateTracker):
 
     @classmethod
     def send_welcome_message_and_keyboard(cls, user: User, update: Update, context: CallbackContext):
-        context.bot.send_message(chat_id=user.user_id, text=welcome_message, reply_markup=welcome_user_keyboard)
+        context.bot.send_message(chat_id=user.user_id, text=welcome_message, reply_markup=welcome_user_keyboard())
 
     @classmethod
     def send_welcome_message_and_keyboard_to_all(cls, bot: Bot):
         users_id_list = User.get_users_id()
         for user_id in users_id_list:
-            bot.send_message(chat_id=user_id, text=welcome_message, reply_markup=welcome_user_keyboard)
+            bot.send_message(chat_id=user_id, text=welcome_message, reply_markup=welcome_user_keyboard())
 
     @classmethod
     def get_user_by_username_or_user_id(

@@ -8,7 +8,7 @@ from telegram.ext import (
     MessageHandler,
     CallbackQueryHandler,
     ContextTypes,
-    ConversationHandler
+    ConversationHandler,
 )
 
 from dtb.settings import DEBUG
@@ -26,23 +26,25 @@ from tgbot.handlers.message import handlers as message_handlers
 from tgbot.handlers.chats import handlers as chats_handlers
 from tgbot.main import bot
 from tgbot.states import (
-    SELECTING_ACTION, 
+    SELECTING_ACTION,
     QUESTION,
     ASKING_QUESTION,
-    HELP, 
-    EXPORT_QUESTIONS, 
+    HELP,
+    EXPORT_QUESTIONS,
     SUPPORT_CHAT,
-    STOP_BOT, 
-    SELECTING_LEVEL, 
-    SELECTING_SUPPORT_CHAT, 
-    SELECT_STOP_BOT, 
+    SELECT_SUPPORT_CHAT,
+    SUPPORT_CHAT_AND_NUMBER,
+    STOP_BOT,
+    SELECTING_LEVEL,
+    SELECTING_SUPPORT_CHAT,
+    SELECT_STOP_BOT,
     SELECT_STOP_AND_REMOVE_ALL,
-    SELECTING_FEATURE, 
-    TYPING, 
-    STOPPING, 
-    SHOWING, 
+    SELECTING_FEATURE,
+    TYPING,
+    STOPPING,
+    SHOWING,
     END,
-    HAS_QUESTION
+    HAS_QUESTION,
 )
 
 
@@ -64,24 +66,61 @@ def setup_dispatcher(dp):
     #     )
     # )
 
-    ask_question_conv = ConversationHandler(
+    support_chats_conv = ConversationHandler(
         entry_points=[
             CallbackQueryHandler(
-                message_handlers.asking_question, pattern="^" + str(ASKING_QUESTION) + "$"
+                chats_handlers.list_sup_chat, pattern="^" + str(SUPPORT_CHAT) + "$"
             )
         ],
         states={
-            # ASK_QUESTION: [
-            #     CallbackQueryHandler(message_handlers.ask_question, pattern="^" + str(ASK_QUESTION) + "$")
-            # ],
-            ASKING_QUESTION: [
-                CallbackQueryHandler(message_handlers.asking_question, pattern="^" + str(ASKING_QUESTION) + "$")
+            SUPPORT_CHAT: [
+                CallbackQueryHandler(
+                    chats_handlers.list_sup_chat, pattern="^" + str(SUPPORT_CHAT) + "$"
+                )
             ],
-            # HAS_QUESTION: [MessageHandler(Filters.text, message_handlers.handle_only_questions)],
-            TYPING: [MessageHandler(Filters.text, message_handlers.handle_only_questions)],
+            SELECT_SUPPORT_CHAT: [
+                CallbackQueryHandler(
+                    chats_handlers.handle_support_chat,
+                    pattern=f"^{SUPPORT_CHAT_AND_NUMBER}", pass_user_data=True
+                )
+            ],
         },
         fallbacks=[
-            CallbackQueryHandler(message_handlers.end_asking_question, pattern="^" + str(END) + "$"),
+            CallbackQueryHandler(
+                chats_handlers.end_support_chat, pattern="^" + str(END) + "$"
+            ),
+            CommandHandler("stop", onboarding_handlers.stop_nested),
+        ],
+        map_to_parent={
+            # Возвращаемся к основному диалогу.
+            END: SELECTING_ACTION,
+            # End conversation altogether
+            STOPPING: STOPPING,
+        },
+    )
+
+    ask_question_conv = ConversationHandler(
+        entry_points=[
+            CallbackQueryHandler(
+                message_handlers.asking_question,
+                pattern="^" + str(ASKING_QUESTION) + "$",
+            )
+        ],
+        states={
+            ASKING_QUESTION: [
+                CallbackQueryHandler(
+                    message_handlers.asking_question,
+                    pattern="^" + str(ASKING_QUESTION) + "$",
+                )
+            ],
+            TYPING: [
+                MessageHandler(Filters.text, message_handlers.handle_only_questions)
+            ],
+        },
+        fallbacks=[
+            CallbackQueryHandler(
+                message_handlers.end_asking_question, pattern="^" + str(END) + "$"
+            ),
             CommandHandler("stop", onboarding_handlers.stop_nested),
         ],
         map_to_parent={
@@ -93,7 +132,18 @@ def setup_dispatcher(dp):
     )
 
     selection_handlers = [
-        CallbackQueryHandler(message_handlers.ask_question_button_press, pattern="^" + str(QUESTION) + "$"),
+        CallbackQueryHandler(
+            message_handlers.ask_question_button_press,
+            pattern="^" + str(QUESTION) + "$",
+        ),
+        # CallbackQueryHandler(
+        #     chats_handlers.support_chat_button_press,
+        #     pattern="^" + str(SUPPORT_CHAT) + "$",
+        # ),
+        CallbackQueryHandler(
+            chats_handlers.support_chat_button_press,
+            pattern="^" + str(SUPPORT_CHAT) + "$",
+        )
         # CallbackQueryHandler(message_handlers.export_questions, pattern="^" + str(EXPORT_QUESTIONS) + "$"),
         # CallbackQueryHandler(onboarding_handlers.end, pattern="^" + str(END) + "$"),
     ]
@@ -101,20 +151,26 @@ def setup_dispatcher(dp):
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler("start", onboarding_handlers.command_start)],
         states={
-            SHOWING: [CallbackQueryHandler(onboarding_handlers.command_start, pattern="^" + str(END) + "$")],
+            SHOWING: [
+                CallbackQueryHandler(
+                    onboarding_handlers.command_start, pattern="^" + str(END) + "$"
+                )
+            ],
             SELECTING_ACTION: selection_handlers,
             SELECTING_LEVEL: selection_handlers,
             QUESTION: [ask_question_conv],
+            SUPPORT_CHAT: [support_chats_conv],
             STOPPING: [CommandHandler("start", onboarding_handlers.command_start)],
         },
         fallbacks=[
-            CallbackQueryHandler(onboarding_handlers.stop_main_conv, pattern="^" + str(END) + "$"), 
-            CommandHandler("stop", onboarding_handlers.stop_main_conv)
+            CallbackQueryHandler(
+                onboarding_handlers.stop_main_conv, pattern="^" + str(END) + "$"
+            ),
+            CommandHandler("stop", onboarding_handlers.stop_main_conv),
         ],
     )
 
     dp.add_handler(conv_handler)
-
 
     # # onboarding
     # dp.add_handler(CommandHandler("start", onboarding_handlers.command_start))
@@ -128,7 +184,6 @@ def setup_dispatcher(dp):
     # dp.add_handler(
     #     MessageHandler(Filters.text, message_handlers.handle_message_or_question)
     # )
-
 
     # dp.add_handler(
     #     CallbackQueryHandler(message_handlers.ask_question, pattern="^ask_question$")
@@ -149,7 +204,7 @@ def setup_dispatcher(dp):
     #     )
     # )
 
-    # ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+    # //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     # # location
     # dp.add_handler(CommandHandler("ask_location", location_handlers.ask_for_location))
     # dp.add_handler(MessageHandler(Filters.location, location_handlers.location_handler))
