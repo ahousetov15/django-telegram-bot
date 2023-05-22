@@ -90,7 +90,7 @@ def setup_dispatcher(dp):
             CallbackQueryHandler(
                 chats_handlers.end_support_chat, pattern="^" + str(END) + "$"
             ),
-            CommandHandler("stop", onboarding_handlers.stop_nested),
+            CommandHandler("stop", onboarding_handlers.stop_main_conv),
         ],
         map_to_parent={
             # Возвращаемся к основному диалогу.
@@ -122,7 +122,7 @@ def setup_dispatcher(dp):
             CallbackQueryHandler(
                 message_handlers.end_asking_question, pattern="^" + str(END) + "$"
             ),
-            CommandHandler("stop", onboarding_handlers.stop_nested),
+            CommandHandler("stop", onboarding_handlers.stop_main_conv),
         ],
         map_to_parent={
             # Возвращаемся к основному диалогу.
@@ -136,19 +136,13 @@ def setup_dispatcher(dp):
         ask_question_conv,
         support_chats_conv,
         CallbackQueryHandler(message_handlers.export_questions, pattern="^" + str(EXPORT_QUESTIONS) + "$"),
-        CallbackQueryHandler(onboarding_handlers.end_buttton_clicked, pattern="^" + str(END) + "$"),
+        CallbackQueryHandler(onboarding_handlers.stop_main_conv, pattern="^" + str(END) + "$")
     ]
 
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler("start", onboarding_handlers.command_start)],
         states={
-            SHOWING: [
-                CallbackQueryHandler(
-                    onboarding_handlers.command_start, pattern="^" + str(END) + "$"
-                )
-            ],
             SELECTING_ACTION: selection_handlers,
-            SELECTING_LEVEL: selection_handlers,
             QUESTION: [ask_question_conv],
             SUPPORT_CHAT: [support_chats_conv],
             STOPPING: [CommandHandler("start", onboarding_handlers.command_start)],
@@ -156,8 +150,8 @@ def setup_dispatcher(dp):
         fallbacks=[
             CallbackQueryHandler(
                 onboarding_handlers.stop_main_conv, pattern="^" + str(END) + "$"
-            ),
-            CommandHandler("stop", onboarding_handlers.stop_main_conv),
+            ), # по большому счету не нужен, т.к. отрабатывает в selection_handlers
+            CommandHandler("stop", onboarding_handlers.stop_main_conv)
         ],
     )
 

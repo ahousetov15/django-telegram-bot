@@ -49,12 +49,12 @@ def command_start(update: Update, context: CallbackContext) -> None:
 
 def stop_main_conv(update: Update, context: CallbackContext) -> int:
     """End Conversation by command."""
-    # update.message.reply_text("До встречи!")
-    keyboard = [
-        [KeyboardButton("/start")]
-    ]
-    reply_markup = ReplyKeyboardMarkup(keyboard)
-    context.bot.send_message(chat_id=update.effective_chat.id, text="До встречи!", reply_markup=reply_markup)
+    # keyboard = [
+    #     [KeyboardButton("/start")]
+    # ]
+    # reply_markup = ReplyKeyboardMarkup(keyboard)
+    # context.bot.send_message(chat_id=update.effective_chat.id, text="До встречи!", reply_markup=reply_markup)
+    context.bot.send_message(chat_id=update.effective_chat.id, text="До встречи!")
     return ConversationHandler.END
 
 
@@ -68,11 +68,11 @@ def end_buttton_clicked(update: Update, context: CallbackContext) -> int:
     return END
 
 
-def stop_nested(update: Update, context: CallbackContext) -> str:
-    """Completely end conversation from within nested conversation."""
-    update.message.reply_text("Okay, bye.")
+# def stop_nested(update: Update, context: CallbackContext) -> str:
+#     """Completely end conversation from within nested conversation."""
+#     update.message.reply_text("Okay, bye.")
 
-    return STOPPING
+#     return STOPPING
 
 
 

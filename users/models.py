@@ -3,7 +3,7 @@ import logging
 from typing import Union, Optional, Tuple, List
 from django.db import models
 from django.db.models import QuerySet, Manager
-from telegram import Update, Bot
+from telegram import Update, Bot, error
 from telegram.ext import CallbackContext
 from tgbot.handlers.utils.info import extract_user_data_from_update, extract_new_chat_members_from_update
 from utils.models import CreateUpdateTracker, nb, CreateTracker, GetOrNoneManager
@@ -86,9 +86,8 @@ class User(CreateUpdateTracker):
                     ):  # you can't invite yourself
                         u.deep_link = payload
                 u.save()
-                User.send_welcome_message_and_keyboard(user=u, update=update, context=context)
-                # created_users.append(u)
-        # return created_users
+                # User.send_welcome_message_and_keyboard(user=u, update=update, context=context)
+
 
 
     @classmethod
@@ -136,18 +135,20 @@ class User(CreateUpdateTracker):
             for admin_chat_id, admin_values in admins_dict.items():
                 context.bot.send_message(chat_id=admin_chat_id, text=message)
 
-    @classmethod
-    def send_welcome_message_and_keyboard(cls, user: User, update: Update, context: CallbackContext):
-        context.bot.send_message(chat_id=user.user_id, text=welcome_message, reply_markup=welcome_user_keyboard())
+    # @classmethod
+    # def send_welcome_message_and_keyboard(cls, user: User, update: Update, context: CallbackContext):
+    #     context.bot.send_message(chat_id=user.user_id, text=welcome_message, reply_markup=welcome_user_keyboard())
 
-    @classmethod
-    def send_welcome_message_and_keyboard_to_all(cls, bot: Bot):
-        users_id_list = User.get_users_id()
-        for user_id in users_id_list:
-            try:
-                bot.send_message(chat_id=user_id, text=welcome_message, reply_markup=welcome_user_keyboard())
-            except Exception as e:
-                logging.error(f"Пользователь с id={user_id} возможно не авторизован. Невозможно начать с ним беседу.", exc_info=str(e))
+    # @classmethod
+    # def send_welcome_message_and_keyboard_to_all(cls, bot: Bot):
+    #     users_id_list = User.get_users_id()
+    #     for user_id in users_id_list:
+    #         try:
+    #             bot.send_message(chat_id=user_id, text=welcome_message, reply_markup=welcome_user_keyboard())
+    #         except error.Unauthorized as e:
+    #             logging.error(f"Пользователь с id={user_id} возможно не авторизован. Невозможно начать с ним беседу.", exc_info=str(e))
+    #         except Exception as e:
+    #             logging.error(f"Непонятное исключение.", exc_info=str(e))
 
     @classmethod
     def get_user_by_username_or_user_id(
