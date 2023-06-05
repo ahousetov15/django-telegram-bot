@@ -8,23 +8,16 @@ from utils.models import datetime_str
 from tgbot.handlers.utils.info import send_typing_action
 from tgbot.handlers.admin import static_text
 from tgbot.handlers.onboarding import handlers as onboarding_handlers
+from tgbot.handlers.buttons import not_in_conv_buttons
 from tgbot.states import ASK_QUESTION, ASKING_QUESTION, HAS_QUESTION, QUESTION, START_OVER, TYPING, END, CURRENT_LEVEL, STATES_NO_CHAT_SUPPORT
-
+from .keyboards import ask_question_or_no_question_keyboard, ask_question_or_back_keyboard
 
 
 def ask_question_button_press(update: Update, context: CallbackContext) -> str:
     context.user_data[CURRENT_LEVEL] = QUESTION
     message_text = 'Вы можете задать вопросы ведущему. Они будут сохранены и вы получите ответ, когда ведущий освободиться.'
-    buttons = [
-        [
-            InlineKeyboardButton(text='Задать вопросы', callback_data=str(ASKING_QUESTION)),
-            InlineKeyboardButton(text='Назад', callback_data=str(END))
-        ]
-    ]
-    keyboard = InlineKeyboardMarkup(buttons)
-
     update.callback_query.answer()
-    update.callback_query.edit_message_text(text=message_text, reply_markup=keyboard)
+    update.callback_query.edit_message_text(text=message_text, reply_markup=ask_question_or_back_keyboard())
     # return QUESTION 
     return ASKING_QUESTION 
 
@@ -143,17 +136,10 @@ def handle_only_questions(update: Update, context: CallbackContext) -> str:
         else:
             text="По какой-то причине, ваш запрос не отправлен."
 
-        buttons = [
-            [
-                InlineKeyboardButton(text="Задать вопрос.", callback_data=str(ASKING_QUESTION)),
-                InlineKeyboardButton(text="Нет вопросов.", callback_data=str(END)),
-            ]
-        ]
-        keyboard = InlineKeyboardMarkup(buttons)
         update.message.reply_text(
             text=text, 
             reply_to_message_id=update.message.message_id,
-            reply_markup=keyboard)
+            reply_markup=ask_question_or_no_question_keyboard())
         context.user_data["waiting_for_question"] = False
     return ASKING_QUESTION
 
@@ -189,16 +175,18 @@ def handle_message_or_question(update: Update, context: CallbackContext):
         #     )
         # context.user_data["waiting_for_question"] = False
     else:
-        # if update.message.text == '/start':
-        #     # onboarding_handlers.command_start(update, context)
-        # if context.user_data['CURRENT_LEVEL'] == 'QUESTION':
-        #     ask_question_button_press(update, context)
-        if cur_lvl := context.user_data.get('CURRENT_LEVEL'):
+        cur_lvl = context.user_data.get('CURRENT_LEVEL')
+        if not cur_lvl or cur_lvl == END:
+            not_in_conv_buttons.handle_button_press(update, context)
+        else:
             if cur_lvl == QUESTION:
                 update.message.reply_text(
                     text="Нажмите 'Задать вопрос' чтобы задать вопрос ведущему или 'Закончить' чтобы вернуться в основное меню.",
                     reply_to_message_id=update.message.message_id,
-                ) 
+                    reply_markup=ask_question_or_back_keyboard()
+                )
+            elif cur_lvl == END:
+                not_in_conv_buttons.handle_button_press()
             if cur_lvl not in STATES_NO_CHAT_SUPPORT:
                 if TARGET_CHAT_ID:
                     context.bot.send_message(
@@ -213,7 +201,8 @@ def handle_message_or_question(update: Update, context: CallbackContext):
                         update=update,
                         context=context,
                         message=notification_formatting(update=update),
-                    )   
+                    )
+
 
 
 def end_asking_question(update: Update, context: CallbackContext) -> int:
