@@ -25,11 +25,17 @@ from tgbot.handlers.onboarding.keyboards import make_keyboard_for_start_command
 def command_start(update: Update, context: CallbackContext) -> None:
     u, created = User.get_user_and_created(update, context)
 
+    # Новый пользователь или уже знакомый?
     if created:
         text = static_text.start_created_ru.format(first_name=u.first_name)
     else:
         text = static_text.start_not_created_ru.format(first_name=u.first_name)
-    
+    context.user_data[CURRENT_LEVEL] = START
+    # Пользователь админ?
+    if u.is_admin:
+        text += f"\n\n{static_text.short_describtion_for_admin_ru}"
+    else:
+        text += f"\n\n{static_text.short_describtion_for_user_ru}"
 
     if context.user_data.get(START_OVER):
         update.callback_query.answer()
@@ -54,6 +60,7 @@ def stop_main_conv(update: Update, context: CallbackContext) -> int:
     # ]
     # reply_markup = ReplyKeyboardMarkup(keyboard)
     # context.bot.send_message(chat_id=update.effective_chat.id, text="До встречи!", reply_markup=reply_markup)
+    context.user_data[CURRENT_LEVEL] = END
     context.bot.send_message(chat_id=update.effective_chat.id, text="До встречи!")
     return ConversationHandler.END
 

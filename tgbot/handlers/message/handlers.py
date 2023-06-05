@@ -8,7 +8,8 @@ from utils.models import datetime_str
 from tgbot.handlers.utils.info import send_typing_action
 from tgbot.handlers.admin import static_text
 from tgbot.handlers.onboarding import handlers as onboarding_handlers
-from tgbot.states import ASK_QUESTION, ASKING_QUESTION, HAS_QUESTION, QUESTION, START_OVER, TYPING, END, CURRENT_LEVEL
+from tgbot.states import ASK_QUESTION, ASKING_QUESTION, HAS_QUESTION, QUESTION, START_OVER, TYPING, END, CURRENT_LEVEL, STATES_NO_CHAT_SUPPORT
+
 
 
 def ask_question_button_press(update: Update, context: CallbackContext) -> str:
@@ -163,44 +164,56 @@ def handle_message_or_question(update: Update, context: CallbackContext):
         "waiting_for_question" in context.user_data
         and context.user_data["waiting_for_question"]
     ):
-        new_question, created = Question.add_question(update=update, context=context)
-        if created:
-            if TARGET_CHAT_ID:
-                context.bot.send_message(
-                    chat_id=TARGET_CHAT_ID, text=question_formatting(update)
-                )
-            else:
-                User.notify_admins(
-                    update=update,
-                    context=context,
-                    message=notification_formatting(update=update),
-                )
+        return handle_only_questions(update, context)
+        # new_question, created = Question.add_question(update=update, context=context)
+        # if created:
+        #     if TARGET_CHAT_ID:
+        #         context.bot.send_message(
+        #             chat_id=TARGET_CHAT_ID, text=question_formatting(update)
+        #         )
+        #     else:
+        #         User.notify_admins(
+        #             update=update,
+        #             context=context,
+        #             message=notification_formatting(update=update),
+        #         )
 
-            update.message.reply_text(
-                text="Ваш вопрос был успешно отправлен.",
-                reply_to_message_id=update.message.message_id,
-            )
-        else:
-            update.message.reply_text(
-                text="По какой-то причине, ваш запрос не отправлен.",
-                reply_to_message_id=update.message.message_id,
-            )
-        context.user_data["waiting_for_question"] = False
+        #     update.message.reply_text(
+        #         text="Ваш вопрос был успешно отправлен.",
+        #         reply_to_message_id=update.message.message_id,
+        #     )
+        # else:
+        #     update.message.reply_text(
+        #         text="По какой-то причине, ваш запрос не отправлен.",
+        #         reply_to_message_id=update.message.message_id,
+        #     )
+        # context.user_data["waiting_for_question"] = False
     else:
-        if TARGET_CHAT_ID:
-            context.bot.send_message(
-                chat_id=TARGET_CHAT_ID, text=message_formatting(update)
-            )
-            update.message.reply_text(
-                text="Ваше сообщение было направленно в чат поддержки.",
-                reply_to_message_id=update.message.message_id,
-            )
-        else:
-            User.notify_admins(
-                update=update,
-                context=context,
-                message=notification_formatting(update=update),
-            )
+        # if update.message.text == '/start':
+        #     # onboarding_handlers.command_start(update, context)
+        # if context.user_data['CURRENT_LEVEL'] == 'QUESTION':
+        #     ask_question_button_press(update, context)
+        if cur_lvl := context.user_data.get('CURRENT_LEVEL'):
+            if cur_lvl == QUESTION:
+                update.message.reply_text(
+                    text="Нажмите 'Задать вопрос' чтобы задать вопрос ведущему или 'Закончить' чтобы вернуться в основное меню.",
+                    reply_to_message_id=update.message.message_id,
+                ) 
+            if cur_lvl not in STATES_NO_CHAT_SUPPORT:
+                if TARGET_CHAT_ID:
+                    context.bot.send_message(
+                        chat_id=TARGET_CHAT_ID, text=message_formatting(update)
+                    )
+                    update.message.reply_text(
+                        text="Ваше сообщение было направленно в чат поддержки.",
+                        reply_to_message_id=update.message.message_id,
+                    )
+                else:
+                    User.notify_admins(
+                        update=update,
+                        context=context,
+                        message=notification_formatting(update=update),
+                    )   
 
 
 def end_asking_question(update: Update, context: CallbackContext) -> int:

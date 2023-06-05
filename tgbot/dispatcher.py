@@ -24,6 +24,7 @@ from tgbot.handlers.broadcast_message import handlers as broadcast_handlers
 from tgbot.handlers.status_update import handlers as status_update_handlers
 from tgbot.handlers.message import handlers as message_handlers
 from tgbot.handlers.chats import handlers as chats_handlers
+from tgbot.handlers.buttons import not_in_conv_buttons 
 from tgbot.main import bot
 from tgbot.states import (
     SELECTING_ACTION,
@@ -168,6 +169,9 @@ def setup_dispatcher(dp):
         MessageHandler(Filters.text, message_handlers.handle_message_or_question)
     )
 
+    dp.add_handler(
+        CallbackQueryHandler(not_in_conv_buttons.handle_button_press)
+    )
 
     # //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     # # location
