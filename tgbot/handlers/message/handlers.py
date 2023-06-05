@@ -151,29 +151,6 @@ def handle_message_or_question(update: Update, context: CallbackContext):
         and context.user_data["waiting_for_question"]
     ):
         return handle_only_questions(update, context)
-        # new_question, created = Question.add_question(update=update, context=context)
-        # if created:
-        #     if TARGET_CHAT_ID:
-        #         context.bot.send_message(
-        #             chat_id=TARGET_CHAT_ID, text=question_formatting(update)
-        #         )
-        #     else:
-        #         User.notify_admins(
-        #             update=update,
-        #             context=context,
-        #             message=notification_formatting(update=update),
-        #         )
-
-        #     update.message.reply_text(
-        #         text="Ваш вопрос был успешно отправлен.",
-        #         reply_to_message_id=update.message.message_id,
-        #     )
-        # else:
-        #     update.message.reply_text(
-        #         text="По какой-то причине, ваш запрос не отправлен.",
-        #         reply_to_message_id=update.message.message_id,
-        #     )
-        # context.user_data["waiting_for_question"] = False
     else:
         cur_lvl = context.user_data.get('CURRENT_LEVEL')
         if not cur_lvl or cur_lvl == END:
@@ -181,7 +158,7 @@ def handle_message_or_question(update: Update, context: CallbackContext):
         else:
             if cur_lvl == QUESTION:
                 update.message.reply_text(
-                    text="Нажмите 'Задать вопрос' чтобы задать вопрос ведущему или 'Закончить' чтобы вернуться в основное меню.",
+                    text="Нажмите 'Задать вопрос' чтобы задать вопрос ведущему или 'Назад' чтобы вернуться в основное меню.",
                     reply_to_message_id=update.message.message_id,
                     reply_markup=ask_question_or_back_keyboard()
                 )

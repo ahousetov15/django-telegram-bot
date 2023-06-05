@@ -169,6 +169,7 @@ def setup_dispatcher(dp):
         MessageHandler(Filters.text, message_handlers.handle_message_or_question)
     )
 
+    # Обработка нажатия кнопок, вне контекста беседы.
     dp.add_handler(
         CallbackQueryHandler(not_in_conv_buttons.handle_button_press)
     )
