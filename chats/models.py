@@ -76,7 +76,7 @@ class Chats(models.Model):
                         cls.set_chat_as_support(chat_id)
                         return model_to_dict(chat), created
             else:
-               User.add_incoming_user(update=update, context=context)
+                User.add_incoming_user(update=update, context=context)
         return None, False
 
     @classmethod
@@ -94,10 +94,12 @@ class Chats(models.Model):
         return removed
 
     @classmethod
-    def send_to_support_chat(cls, update: Update, context: CallbackContext, message: str):
+    def send_to_support_chat(
+        cls, update: Update, context: CallbackContext, message: str
+    ):
         """
         Сообщение для чата поддержки.
-        
+
         Если чат не установлен, уведомляем отправителя.
         """
         support_chat_id = cls.get_support_chat_id()

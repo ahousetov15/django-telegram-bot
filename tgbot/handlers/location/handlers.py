@@ -8,13 +8,11 @@ from users.models import User, Location
 
 
 def ask_for_location(update: Update, context: CallbackContext) -> None:
-    """ Entered /ask_location command"""
+    """Entered /ask_location command"""
     u = User.get_user(update, context)
 
     context.bot.send_message(
-        chat_id=u.user_id,
-        text=share_location,
-        reply_markup=send_location_keyboard()
+        chat_id=u.user_id, text=share_location, reply_markup=send_location_keyboard()
     )
 
 

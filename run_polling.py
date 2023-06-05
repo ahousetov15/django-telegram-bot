@@ -1,6 +1,6 @@
 import os, django
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'dtb.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dtb.settings")
 django.setup()
 
 from telegram import Bot, KeyboardButton, ReplyKeyboardMarkup
@@ -12,8 +12,9 @@ from tgbot.handlers.admin.static_text import welcome_message
 from users.models import User
 from tgbot.states import ACTIVATE
 
+
 def run_polling(tg_token: str = TELEGRAM_TOKEN):
-    """ Run bot in polling mode """
+    """Run bot in polling mode"""
     updater = Updater(tg_token, use_context=True)
 
     dp = updater.dispatcher

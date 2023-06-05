@@ -1,7 +1,13 @@
 import datetime
 
 from django.utils import timezone
-from telegram import ParseMode, Update, KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove
+from telegram import (
+    ParseMode,
+    Update,
+    KeyboardButton,
+    ReplyKeyboardMarkup,
+    ReplyKeyboardRemove,
+)
 from telegram.ext import CallbackContext, ContextTypes, ConversationHandler
 from tgbot.states import *
 from tgbot.handlers.onboarding import static_text
@@ -39,15 +45,18 @@ def command_start(update: Update, context: CallbackContext) -> None:
 
     if context.user_data.get(START_OVER):
         update.callback_query.answer()
-        update.callback_query.edit_message_text(text=text, reply_markup=make_keyboard_for_start_command())
+        update.callback_query.edit_message_text(
+            text=text, reply_markup=make_keyboard_for_start_command()
+        )
     else:
         context.bot.send_message(
             chat_id=update.effective_chat.id,
             text="Начинаю работу бота.",
-            reply_markup=ReplyKeyboardRemove()
-        )  
-        update.message.reply_text(text=text,
-                                  reply_markup=make_keyboard_for_start_command())
+            reply_markup=ReplyKeyboardRemove(),
+        )
+        update.message.reply_text(
+            text=text, reply_markup=make_keyboard_for_start_command()
+        )
 
     context.user_data[START_OVER] = False
     return SELECTING_ACTION
@@ -82,21 +91,20 @@ def end_buttton_clicked(update: Update, context: CallbackContext) -> int:
 #     return STOPPING
 
 
-
-
-
 def secret_level(update: Update, context: CallbackContext) -> None:
     # callback_data: SECRET_LEVEL_BUTTON variable from manage_data.py
-    """ Pressed 'secret_level_button_text' after /start command"""
-    user_id = extract_user_data_from_update(update)['user_id']
+    """Pressed 'secret_level_button_text' after /start command"""
+    user_id = extract_user_data_from_update(update)["user_id"]
     text = static_text.unlock_secret_room.format(
         user_count=User.objects.count(),
-        active_24=User.objects.filter(updated_at__gte=timezone.now() - datetime.timedelta(hours=24)).count()
+        active_24=User.objects.filter(
+            updated_at__gte=timezone.now() - datetime.timedelta(hours=24)
+        ).count(),
     )
 
     context.bot.edit_message_text(
         text=text,
         chat_id=user_id,
         message_id=update.callback_query.message.message_id,
-        parse_mode=ParseMode.HTML
+        parse_mode=ParseMode.HTML,
     )

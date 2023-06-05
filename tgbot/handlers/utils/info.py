@@ -44,11 +44,11 @@ def extract_new_chat_members_from_update(update: Update) -> List[Dict]:
         if not user.is_bot:
             users_list.append(
                 dict(
-                user_id = user["id"],
-                username = user["username"],
-                first_name = user["first_name"],
-                last_name = user["last_name"],
-                language_code = user["language_code"] 
+                    user_id=user["id"],
+                    username=user["username"],
+                    first_name=user["first_name"],
+                    last_name=user["last_name"],
+                    language_code=user["language_code"],
                 )
             )
     # users_list = [

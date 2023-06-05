@@ -24,7 +24,7 @@ from tgbot.handlers.broadcast_message import handlers as broadcast_handlers
 from tgbot.handlers.status_update import handlers as status_update_handlers
 from tgbot.handlers.message import handlers as message_handlers
 from tgbot.handlers.chats import handlers as chats_handlers
-from tgbot.handlers.buttons import not_in_conv_buttons 
+from tgbot.handlers.buttons import not_in_conv_buttons
 from tgbot.main import bot
 from tgbot.states import (
     SELECTING_ACTION,
@@ -136,8 +136,12 @@ def setup_dispatcher(dp):
     selection_handlers = [
         ask_question_conv,
         support_chats_conv,
-        CallbackQueryHandler(message_handlers.export_questions, pattern="^" + str(EXPORT_QUESTIONS) + "$"),
-        CallbackQueryHandler(onboarding_handlers.stop_main_conv, pattern="^" + str(END) + "$")
+        CallbackQueryHandler(
+            message_handlers.export_questions, pattern="^" + str(EXPORT_QUESTIONS) + "$"
+        ),
+        CallbackQueryHandler(
+            onboarding_handlers.stop_main_conv, pattern="^" + str(END) + "$"
+        ),
     ]
 
     conv_handler = ConversationHandler(
@@ -151,13 +155,12 @@ def setup_dispatcher(dp):
         fallbacks=[
             CallbackQueryHandler(
                 onboarding_handlers.stop_main_conv, pattern="^" + str(END) + "$"
-            ), # по большому счету не нужен, т.к. отрабатывает в selection_handlers
-            CommandHandler("stop", onboarding_handlers.stop_main_conv)
+            ),  # по большому счету не нужен, т.к. отрабатывает в selection_handlers
+            CommandHandler("stop", onboarding_handlers.stop_main_conv),
         ],
     )
 
     dp.add_handler(conv_handler)
-
 
     # admin commands
     # dp.add_handler(CommandHandler("admin", admin_handlers.admin))
@@ -170,9 +173,7 @@ def setup_dispatcher(dp):
     )
 
     # Обработка нажатия кнопок, вне контекста беседы.
-    dp.add_handler(
-        CallbackQueryHandler(not_in_conv_buttons.handle_button_press)
-    )
+    dp.add_handler(CallbackQueryHandler(not_in_conv_buttons.handle_button_press))
 
     # //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     # # location

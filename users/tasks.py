@@ -9,8 +9,11 @@ import telegram
 
 from dtb.celery import app
 from celery.utils.log import get_task_logger
-from tgbot.handlers.broadcast_message.utils import send_one_message, from_celery_entities_to_entities, \
-    from_celery_markup_to_markup
+from tgbot.handlers.broadcast_message.utils import (
+    send_one_message,
+    from_celery_entities_to_entities,
+    from_celery_markup_to_markup,
+)
 
 logger = get_task_logger(__name__)
 
@@ -24,7 +27,7 @@ def broadcast_message(
     sleep_between: float = 0.4,
     parse_mode=telegram.ParseMode.HTML,
 ) -> None:
-    """ It's used to broadcast message to big amount of users """
+    """It's used to broadcast message to big amount of users"""
     logger.info(f"Going to send message: '{text}' to {len(user_ids)} users")
 
     entities_ = from_celery_entities_to_entities(entities)
@@ -44,5 +47,3 @@ def broadcast_message(
         time.sleep(max(sleep_between, 0.1))
 
     logger.info("Broadcast finished!")
-
-

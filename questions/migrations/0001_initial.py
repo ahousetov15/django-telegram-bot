@@ -9,16 +9,21 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('users', '0004_alter_user_language_code'),
+        ("users", "0004_alter_user_language_code"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Question',
+            name="Question",
             fields=[
-                ('msg_id', models.BigAutoField(primary_key=True, serialize=False)),
-                ('text', models.TextField()),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to='users.user')),
+                ("msg_id", models.BigAutoField(primary_key=True, serialize=False)),
+                ("text", models.TextField()),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.DO_NOTHING, to="users.user"
+                    ),
+                ),
             ],
         ),
     ]

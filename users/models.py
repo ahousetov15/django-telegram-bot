@@ -5,11 +5,15 @@ from django.db import models
 from django.db.models import QuerySet, Manager
 from telegram import Update, Bot, error
 from telegram.ext import CallbackContext
-from tgbot.handlers.utils.info import extract_user_data_from_update, extract_new_chat_members_from_update
+from tgbot.handlers.utils.info import (
+    extract_user_data_from_update,
+    extract_new_chat_members_from_update,
+)
 from utils.models import CreateUpdateTracker, nb, CreateTracker, GetOrNoneManager
 from dtb.settings import ADMINS_BY_DEFAULT
 from tgbot.handlers.admin.static_text import welcome_message
 from .keyboards import welcome_user_keyboard
+
 
 class AdminUserManager(Manager):
     def get_queryset(self):
@@ -62,7 +66,6 @@ class User(CreateUpdateTracker):
         }
         return admins_dict
 
-
     @classmethod
     def add_incoming_user(cls, update: Update, context: CallbackContext):
         data_list = extract_new_chat_members_from_update(update)
@@ -87,8 +90,6 @@ class User(CreateUpdateTracker):
                         u.deep_link = payload
                 u.save()
                 # User.send_welcome_message_and_keyboard(user=u, update=update, context=context)
-
-
 
     @classmethod
     def get_user_and_created(
@@ -122,7 +123,6 @@ class User(CreateUpdateTracker):
         all_users = cls.objects.all().values()
         users_id_list = [user["user_id"] for user in all_users]
         return users_id_list
-
 
     @classmethod
     def get_user(cls, update: Update, context: CallbackContext) -> User:

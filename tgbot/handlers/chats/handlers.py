@@ -15,23 +15,33 @@ from .static_text import (
     NO_CHATS,
 )
 
-from tgbot.states import SUPPORT_CHAT, SELECT_SUPPORT_CHAT, CURRENT_LEVEL, START_OVER, END, SELECTING_LEVEL, SHOWING
+from tgbot.states import (
+    SUPPORT_CHAT,
+    SELECT_SUPPORT_CHAT,
+    CURRENT_LEVEL,
+    START_OVER,
+    END,
+    SELECTING_LEVEL,
+    SHOWING,
+)
 from tgbot.handlers.onboarding import handlers as onboarding_handlers
 
 
 def support_chat_button_press(update: Update, context: CallbackContext) -> str:
     context.user_data[CURRENT_LEVEL] = SUPPORT_CHAT
-    message_text = 'Бот устанавливает чаты поддержки: то куда пересылаются сообщения пользователей, для оперативной обратной связи.'
+    message_text = "Бот устанавливает чаты поддержки: то куда пересылаются сообщения пользователей, для оперативной обратной связи."
     buttons = [
         [
-            InlineKeyboardButton(text="Установить чат поддержки.", callback_data=str(SUPPORT_CHAT)),
+            InlineKeyboardButton(
+                text="Установить чат поддержки.", callback_data=str(SUPPORT_CHAT)
+            ),
         ]
     ]
     keyboard = InlineKeyboardMarkup(buttons)
     update.callback_query.answer()
     update.callback_query.edit_message_text(text=message_text, reply_markup=keyboard)
     return SUPPORT_CHAT
- 
+
 
 def list_sup_chat(update: Update, context: CallbackContext):
     context.user_data[CURRENT_LEVEL] = SUPPORT_CHAT
@@ -64,7 +74,9 @@ def handle_support_chat(update: Update, context: CallbackContext):
         chat_id_selected = context.match.string[13:]  # 'support_chat_-842387595'
         buttons = [
             [
-                InlineKeyboardButton(text="Установить чат поддержки.", callback_data=str(SUPPORT_CHAT)),
+                InlineKeyboardButton(
+                    text="Установить чат поддержки.", callback_data=str(SUPPORT_CHAT)
+                ),
                 InlineKeyboardButton(text="Назад.", callback_data=str(END)),
             ]
         ]
@@ -79,12 +91,12 @@ def handle_support_chat(update: Update, context: CallbackContext):
                 )
                 update.callback_query.message.reply_text(
                     text=f"Чатом поддержки теперь является: '{chats[TARGET_CHAT_ID]['chat_name']}'",
-                    reply_markup=keyboard
+                    reply_markup=keyboard,
                 )
         else:
             update.callback_query.message.reply_text(
                 text=f"Выбран текущий чат поддержки: '{chats[TARGET_CHAT_ID]['chat_name']}'",
-                reply_markup=keyboard
+                reply_markup=keyboard,
             )
         context.user_data["waiting_for_support_chat"] = False
 

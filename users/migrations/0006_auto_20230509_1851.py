@@ -6,23 +6,27 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0005_auto_20230509_1757'),
+        ("users", "0005_auto_20230509_1757"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='location',
-            name='created_at',
-            field=models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='Создан'),
+            model_name="location",
+            name="created_at",
+            field=models.DateTimeField(
+                auto_now_add=True, db_index=True, verbose_name="Создан"
+            ),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='created_at',
-            field=models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='Создан'),
+            model_name="user",
+            name="created_at",
+            field=models.DateTimeField(
+                auto_now_add=True, db_index=True, verbose_name="Создан"
+            ),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='updated_at',
-            field=models.DateTimeField(auto_now=True, verbose_name='Обновлен'),
+            model_name="user",
+            name="updated_at",
+            field=models.DateTimeField(auto_now=True, verbose_name="Обновлен"),
         ),
     ]

@@ -6,17 +6,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('questions', '0002_auto_20230509_1752'),
+        ("questions", "0002_auto_20230509_1752"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='question',
-            options={'ordering': ('-created_at',)},
+            name="question",
+            options={"ordering": ("-created_at",)},
         ),
         migrations.AlterField(
-            model_name='question',
-            name='created_at',
-            field=models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='Создан'),
+            model_name="question",
+            name="created_at",
+            field=models.DateTimeField(
+                auto_now_add=True, db_index=True, verbose_name="Создан"
+            ),
         ),
     ]

@@ -9,17 +9,31 @@ from tgbot.handlers.utils.info import send_typing_action
 from tgbot.handlers.admin import static_text
 from tgbot.handlers.onboarding import handlers as onboarding_handlers
 from tgbot.handlers.buttons import not_in_conv_buttons
-from tgbot.states import ASK_QUESTION, ASKING_QUESTION, HAS_QUESTION, QUESTION, START_OVER, TYPING, END, CURRENT_LEVEL, STATES_NO_CHAT_SUPPORT
-from .keyboards import ask_question_or_no_question_keyboard, ask_question_or_back_keyboard
+from tgbot.states import (
+    ASK_QUESTION,
+    ASKING_QUESTION,
+    HAS_QUESTION,
+    QUESTION,
+    START_OVER,
+    TYPING,
+    END,
+    CURRENT_LEVEL,
+    STATES_NO_CHAT_SUPPORT,
+)
+from .keyboards import (
+    ask_question_or_no_question_keyboard,
+    ask_question_or_back_keyboard,
+)
 
 
 def ask_question_button_press(update: Update, context: CallbackContext) -> str:
     context.user_data[CURRENT_LEVEL] = QUESTION
-    message_text = 'Вы можете задать вопросы ведущему. Они будут сохранены и вы получите ответ, когда ведущий освободиться.'
+    message_text = "Вы можете задать вопросы ведущему. Они будут сохранены и вы получите ответ, когда ведущий освободиться."
     update.callback_query.answer()
-    update.callback_query.edit_message_text(text=message_text, reply_markup=ask_question_or_back_keyboard())
-    # return QUESTION 
-    return ASKING_QUESTION 
+    update.callback_query.edit_message_text(
+        text=message_text, reply_markup=ask_question_or_back_keyboard()
+    )
+    return ASKING_QUESTION
 
 
 # def ask_question(update: Update, context: CallbackContext) -> str:
@@ -39,7 +53,7 @@ def ask_question_button_press(update: Update, context: CallbackContext) -> str:
 
 #         # update.callback_query.answer()
 #         # update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
-#         return asking_question(update, context) 
+#         return asking_question(update, context)
 #     # But after we do that, we need to send a new message
 #     else:
 #         text = "Отлично! Остались вопросы?"
@@ -66,7 +80,13 @@ def asking_question(update: Update, context: CallbackContext) -> str:
 
 @send_typing_action
 def export_questions(update: Update, context: CallbackContext):
-    file_name, excel_questions, count, first_date, last_date  = Question.export_question_to_excel()
+    (
+        file_name,
+        excel_questions,
+        count,
+        first_date,
+        last_date,
+    ) = Question.export_question_to_excel()
     removed = Question.remove_question()
     u = User.get_user(update, context)
     if not u.is_admin:
@@ -76,9 +96,9 @@ def export_questions(update: Update, context: CallbackContext):
         with excel_questions as file:
             caption = f"Всего вопросов: {count}\nДата первого вопроса: {first_date}\nДата последнего вопроса: {last_date}\n\n"
             context.bot.send_document(
-                chat_id=u.user_id, 
+                chat_id=u.user_id,
                 document=InputFile(file, filename=file_name),
-                caption=caption
+                caption=caption,
             )
     else:
         context.bot.send_message(chat_id=u.user_id, text=file_name)
@@ -132,14 +152,15 @@ def handle_only_questions(update: Update, context: CallbackContext) -> str:
                 )
 
             context.user_data[START_OVER] = True
-            text="Ваш вопрос был успешно отправлен. У вас остались вопросы?"
+            text = "Ваш вопрос был успешно отправлен. У вас остались вопросы?"
         else:
-            text="По какой-то причине, ваш запрос не отправлен."
+            text = "По какой-то причине, ваш запрос не отправлен."
 
         update.message.reply_text(
-            text=text, 
+            text=text,
             reply_to_message_id=update.message.message_id,
-            reply_markup=ask_question_or_no_question_keyboard())
+            reply_markup=ask_question_or_no_question_keyboard(),
+        )
         context.user_data["waiting_for_question"] = False
     return ASKING_QUESTION
 
@@ -152,7 +173,7 @@ def handle_message_or_question(update: Update, context: CallbackContext):
     ):
         return handle_only_questions(update, context)
     else:
-        cur_lvl = context.user_data.get('CURRENT_LEVEL')
+        cur_lvl = context.user_data.get("CURRENT_LEVEL")
         if not cur_lvl or cur_lvl == END:
             not_in_conv_buttons.handle_button_press(update, context)
         else:
@@ -160,7 +181,7 @@ def handle_message_or_question(update: Update, context: CallbackContext):
                 update.message.reply_text(
                     text="Нажмите 'Задать вопрос' чтобы задать вопрос ведущему или 'Назад' чтобы вернуться в основное меню.",
                     reply_to_message_id=update.message.message_id,
-                    reply_markup=ask_question_or_back_keyboard()
+                    reply_markup=ask_question_or_back_keyboard(),
                 )
             elif cur_lvl == END:
                 not_in_conv_buttons.handle_button_press()
@@ -179,7 +200,6 @@ def handle_message_or_question(update: Update, context: CallbackContext):
                         context=context,
                         message=notification_formatting(update=update),
                     )
-
 
 
 def end_asking_question(update: Update, context: CallbackContext) -> int:

@@ -35,9 +35,9 @@ class Question(CreateTracker):
             msg_id=update.message.message_id, user=user, text=update.message.text
         )
         return new_question, created
-    
+
     @classmethod
-    def remove_question(cls, msg_id = None) -> int:
+    def remove_question(cls, msg_id=None) -> int:
         if msg_id:
             question_for_remove = cls.objects.get(msg_id)
         else:
@@ -49,12 +49,12 @@ class Question(CreateTracker):
     @classmethod
     def questions_meta(cls, queryset: QuerySet) -> Tuple[int, str, str]:
         count = str(queryset.count())
-        if count == '0':
-           first_date, last_date = "", ""
+        if count == "0":
+            first_date, last_date = "", ""
         else:
-            first_date, last_date = datetime_str(queryset.first().created_at), datetime_str(
-                queryset.last().created_at
-            ) 
+            first_date, last_date = datetime_str(
+                queryset.first().created_at
+            ), datetime_str(queryset.last().created_at)
         return count, first_date, last_date
 
     @classmethod
@@ -65,7 +65,7 @@ class Question(CreateTracker):
         # )
         count, first_date, last_date = cls.questions_meta(queryset)
         if count == 0:
-           excel_file_name = "На " 
+            excel_file_name = "На "
         if count.endswith("1"):
             question_numerals = "вопрос"
         elif count.endswith(
@@ -104,7 +104,7 @@ class Question(CreateTracker):
         questions_count, first_date, last_date = cls.questions_meta(questions)
         if questions_count == "0":
             excel_file_name = no_questions
-            return excel_file_name, None, questions_count, first_date, last_date 
+            return excel_file_name, None, questions_count, first_date, last_date
         workbook = openpyxl.Workbook()
         worksheet = workbook.active
         worksheet.title = cls.generate_excel_file_name(questions)

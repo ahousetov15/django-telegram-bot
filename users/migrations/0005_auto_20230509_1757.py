@@ -6,48 +6,62 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0004_alter_user_language_code'),
+        ("users", "0004_alter_user_language_code"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='user',
-            name='deep_link',
-            field=models.CharField(blank=True, max_length=64, null=True, verbose_name='Ссылка пользователя'),
+            model_name="user",
+            name="deep_link",
+            field=models.CharField(
+                blank=True, max_length=64, null=True, verbose_name="Ссылка пользователя"
+            ),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='first_name',
-            field=models.CharField(max_length=256, verbose_name='Имя'),
+            model_name="user",
+            name="first_name",
+            field=models.CharField(max_length=256, verbose_name="Имя"),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='is_admin',
-            field=models.BooleanField(default=False, verbose_name='Администратор'),
+            model_name="user",
+            name="is_admin",
+            field=models.BooleanField(default=False, verbose_name="Администратор"),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='is_blocked_bot',
-            field=models.BooleanField(default=False, verbose_name='Забанен ботом'),
+            model_name="user",
+            name="is_blocked_bot",
+            field=models.BooleanField(default=False, verbose_name="Забанен ботом"),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='language_code',
-            field=models.CharField(blank=True, help_text='Язык пользователя', max_length=8, null=True, verbose_name='Язык пользователя'),
+            model_name="user",
+            name="language_code",
+            field=models.CharField(
+                blank=True,
+                help_text="Язык пользователя",
+                max_length=8,
+                null=True,
+                verbose_name="Язык пользователя",
+            ),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='last_name',
-            field=models.CharField(blank=True, max_length=256, null=True, verbose_name='Фамилия'),
+            model_name="user",
+            name="last_name",
+            field=models.CharField(
+                blank=True, max_length=256, null=True, verbose_name="Фамилия"
+            ),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='user_id',
-            field=models.PositiveBigIntegerField(primary_key=True, serialize=False, verbose_name='Номер пользователя'),
+            model_name="user",
+            name="user_id",
+            field=models.PositiveBigIntegerField(
+                primary_key=True, serialize=False, verbose_name="Номер пользователя"
+            ),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='username',
-            field=models.CharField(blank=True, max_length=32, null=True, verbose_name='Никнейм'),
+            model_name="user",
+            name="username",
+            field=models.CharField(
+                blank=True, max_length=32, null=True, verbose_name="Никнейм"
+            ),
         ),
     ]

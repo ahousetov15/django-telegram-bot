@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0003_rm_unused_fields'),
+        ("users", "0003_rm_unused_fields"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='user',
-            name='language_code',
-            field=models.CharField(blank=True, help_text='Язык пользователя', max_length=8, null=True),
+            model_name="user",
+            name="language_code",
+            field=models.CharField(
+                blank=True, help_text="Язык пользователя", max_length=8, null=True
+            ),
         ),
     ]
