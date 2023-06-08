@@ -1,5 +1,5 @@
 """
-    Telegram event handlers
+Telegram event handlers
 """
 from telegram.ext import (
     Dispatcher,
@@ -10,12 +10,10 @@ from telegram.ext import (
     ContextTypes,
     ConversationHandler,
 )
-
 from dtb.settings import DEBUG
 from tgbot.handlers.broadcast_message.manage_data import CONFIRM_DECLINE_BROADCAST
 from tgbot.handlers.broadcast_message.static_text import broadcast_command
 from tgbot.handlers.onboarding.manage_data import SECRET_LEVEL_BUTTON
-
 from tgbot.handlers.utils import files, error
 from tgbot.handlers.admin import handlers as admin_handlers
 from tgbot.handlers.location import handlers as location_handlers
@@ -25,6 +23,7 @@ from tgbot.handlers.status_update import handlers as status_update_handlers
 from tgbot.handlers.message import handlers as message_handlers
 from tgbot.handlers.chats import handlers as chats_handlers
 from tgbot.handlers.buttons import not_in_conv_buttons
+from tgbot.handlers.banhammer import handlers as banhammer_handler
 from tgbot.main import bot
 from tgbot.states import (
     SELECTING_ACTION,
@@ -46,6 +45,8 @@ from tgbot.states import (
     SHOWING,
     END,
     HAS_QUESTION,
+    BAN,
+    BAN_LIST
 )
 
 
@@ -65,6 +66,33 @@ def setup_dispatcher(dp):
             Filters.status_update.left_chat_member,
             status_update_handlers.remove_bot_from_chat,
         )
+    )
+
+    banhammer_conv = ConversationHandler(
+        entry_points=[
+            CallbackQueryHandler(
+                banhammer_handler.banhammer_button_press, pattern="^" + str(BAN) + "$"
+            )
+        ],
+        states={
+            BAN_LIST: [
+                CallbackQueryHandler(
+                    banhammer_handler.handle_callback, pattern="^"+str(BAN_LIST)+"$"
+                )
+            ]
+        },
+        fallbacks=[
+            CallbackQueryHandler(
+                banhammer_handler.end_banhammer, pattern="^" + str(END) + "$"
+            ),
+            CommandHandler("stop", onboarding_handlers.stop_main_conv),
+        ],
+        map_to_parent={
+            # Возвращаемся к основному диалогу.
+            END: SELECTING_ACTION,
+            # End conversation altogether
+            STOPPING: STOPPING,
+        },
     )
 
     support_chats_conv = ConversationHandler(
@@ -139,9 +167,10 @@ def setup_dispatcher(dp):
         CallbackQueryHandler(
             message_handlers.export_questions, pattern="^" + str(EXPORT_QUESTIONS) + "$"
         ),
+        banhammer_conv,
         CallbackQueryHandler(
             onboarding_handlers.stop_main_conv, pattern="^" + str(END) + "$"
-        ),
+        )
     ]
 
     conv_handler = ConversationHandler(
@@ -150,6 +179,7 @@ def setup_dispatcher(dp):
             SELECTING_ACTION: selection_handlers,
             QUESTION: [ask_question_conv],
             SUPPORT_CHAT: [support_chats_conv],
+            BAN: [banhammer_conv],
             STOPPING: [CommandHandler("start", onboarding_handlers.command_start)],
         },
         fallbacks=[

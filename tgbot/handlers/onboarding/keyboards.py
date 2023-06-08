@@ -5,7 +5,7 @@ from tgbot.handlers.onboarding.static_text import (
     github_button_text,
     secret_level_button_text,
 )
-from tgbot.states import ASK_QUESTION, QUESTION, EXPORT_QUESTIONS, SUPPORT_CHAT, END
+from tgbot.states import ASK_QUESTION, QUESTION, EXPORT_QUESTIONS, SUPPORT_CHAT, BAN, END
 
 
 def make_keyboard_for_start_command() -> InlineKeyboardMarkup:
@@ -19,6 +19,11 @@ def make_keyboard_for_start_command() -> InlineKeyboardMarkup:
         [
             InlineKeyboardButton(
                 "Получить вопросы", callback_data=str(EXPORT_QUESTIONS)
+            ),
+        ],
+        [
+            InlineKeyboardButton(
+                "Банхаммер", callback_data=str(BAN)
             ),
         ],
         [InlineKeyboardButton("Закончить", callback_data=str(END))],

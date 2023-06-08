@@ -90,6 +90,41 @@ class User(CreateUpdateTracker):
                         u.deep_link = payload
                 u.save()
                 # User.send_welcome_message_and_keyboard(user=u, update=update, context=context)
+    
+    
+    @classmethod
+    def get_user_by_first_last_username(cls, first_n, last_n, username):
+        users = cls.objects.filter(first_name=first_n, last_name=last_n, username=username)
+        if len(users) != 1:
+            return None
+        return users[0]
+
+    @classmethod
+    def ban_all(cls):
+        users = cls.objects.all()
+        for user in users:
+            if not user.is_admin:
+                user.is_blocked_bot = True
+        User.objects.bulk_update(users, ["is_blocked_bot"])
+        
+    @classmethod
+    def bulk_save_is_blocked_bot(cls):
+        users = cls.objects.all()
+        User.objects.bulk_update(users, ["is_blocked_bot"])
+
+
+    @classmethod
+    def get_users_button_captions(cls) -> List[dict]:
+        btn_captions = [ 
+            {
+                "username": u["username"],
+                "first_name": u["first_name"],
+                "last_name": u["last_name"],
+                "is_blocked_bot": u["is_blocked_bot"]
+            }
+            for u in cls.objects.order_by("first_name", "last_name").values()
+        ]
+        return btn_captions
 
     @classmethod
     def get_user_and_created(
