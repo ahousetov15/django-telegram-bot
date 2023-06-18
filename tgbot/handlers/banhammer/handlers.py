@@ -1,24 +1,29 @@
 from telegram import Update, InputFile, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext, ContextTypes
-from tgbot.states import BAN, BAN_LIST, END, CURRENT_LEVEL
 from users.models import User
 from .keyboards import users_keyboard
 from tgbot.handlers.onboarding import handlers as onboarding_handlers
 
+from tgbot.states import BAN, BAN_LIST, END, CURRENT_LEVEL
+
 
 def banhammer_button_press(update: Update, context: CallbackContext) -> str:
     context.user_data[CURRENT_LEVEL] = BAN
-    display_users(context, update, page=1)
+    display_users(update, context, page=1)
     return BAN_LIST
+
 
 def display_users(update: Update, context: CallbackContext, page: int = None):
     message_text = "Администратор может забанить/разбанить отдельных участников или целую группу разом."
     query = update.callback_query
     query.answer()
     btn_captions = User.get_users_button_captions()
+    rpl_mrkp = users_keyboard(btn_captions=btn_captions, page=page)
     update.callback_query.edit_message_text(
-        text=message_text, reply_markup=users_keyboard(btn_captions=btn_captions, page=page)
+        text=message_text,
+        reply_markup=rpl_mrkp,
     )
+
 
 def handle_callback(update: Update, context: CallbackContext):
     query = update.callback_query
@@ -36,7 +41,7 @@ def handle_callback(update: Update, context: CallbackContext):
         display_users(update, context, new_page)
     elif callback_data.startswith("ban_all"):
         User.ban_all()
-        display_users(update, context, 1) 
+        display_users(update, context, 1)
     elif callback_data.startswith("save_ban"):
         User.bulk_save_is_blocked_bot()
         display_users(update, context, 1)
@@ -49,9 +54,10 @@ def handle_callback(update: Update, context: CallbackContext):
         if u:
             u.is_blocked_bot = not u.is_blocked_bot
             if u.is_blocked_bot:
-                btn_text+="🚫"
+                btn_text += "🚫"
             else:
                 btn_text.replace("🚫", "")
+
 
 def end_banhammer(update: Update, context: CallbackContext) -> int:
     """End gathering of features and return to parent conversation."""

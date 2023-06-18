@@ -1,12 +1,6 @@
 from telegram import Update, InputFile, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 from chats.models import Chats
-from users.models import User
-from questions.models import Question
-from dtb.settings import MSK_TZ
-from utils.models import datetime_str
-from tgbot.handlers.utils.info import send_typing_action
-from tgbot.handlers.admin import static_text
 from .keyboards import keyboard_bot_chats
 from .static_text import (
     chat_exists_in_number,
