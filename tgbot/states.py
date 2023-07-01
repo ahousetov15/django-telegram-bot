@@ -58,6 +58,8 @@ ACTIVATE = False
     "BAN_LIST"
 ]
 
+# BANHAMMER BUTTONS
+PREV_, NEXT_, BAN_ALL, SAVE_BAN, ITEM_ = ["prev_.*", "next_.*", "ban_all", "save_ban", "item_.*"]
 
 
 STATES_NO_CHAT_SUPPORT = [QUESTION, END]

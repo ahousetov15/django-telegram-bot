@@ -46,7 +46,8 @@ from tgbot.states import (
     END,
     HAS_QUESTION,
     BAN,
-    BAN_LIST
+    BAN_LIST,
+    PREV_, NEXT_, BAN_ALL, SAVE_BAN, ITEM_
 )
 
 
@@ -77,8 +78,20 @@ def setup_dispatcher(dp):
         states={
             BAN_LIST: [
                 CallbackQueryHandler(
-                    banhammer_handler.handle_callback, pattern="^"+str(BAN_LIST)+"$"
-                )
+                    banhammer_handler.handle_callback, pattern="^"+str(PREV_)+"$"
+                ),
+                CallbackQueryHandler(
+                    banhammer_handler.handle_callback, pattern="^"+str(NEXT_)+"$"
+                ),
+                CallbackQueryHandler(
+                    banhammer_handler.handle_callback, pattern="^"+str(BAN_ALL)+"$"
+                ),
+                CallbackQueryHandler(
+                    banhammer_handler.handle_callback, pattern="^"+str(SAVE_BAN)+"$"
+                ),
+                CallbackQueryHandler(
+                    banhammer_handler.handle_callback, pattern="^"+str(ITEM_)+"$"
+                ),
             ]
         },
         fallbacks=[
