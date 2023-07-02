@@ -91,6 +91,10 @@ class User(CreateUpdateTracker):
                 u.save()
                 # User.send_welcome_message_and_keyboard(user=u, update=update, context=context)
     
+    @classmethod
+    def get_user_by_user_id(cls, user_id):
+        users = cls.objects.filter(user_id=user_id)
+        return users[0]  
     
     @classmethod
     def get_user_by_first_last_username(cls, first_n, last_n, username):
@@ -120,7 +124,8 @@ class User(CreateUpdateTracker):
                 "username": u["username"],
                 "first_name": u["first_name"],
                 "last_name": u["last_name"],
-                "is_blocked_bot": u["is_blocked_bot"]
+                "is_blocked_bot": u["is_blocked_bot"],
+                "user_id": u["user_id"]
             }
             for u in cls.objects.order_by("first_name", "last_name").values()
         ]
