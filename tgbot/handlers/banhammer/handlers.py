@@ -5,7 +5,7 @@ from users.models import User
 from .keyboards import users_keyboard
 from tgbot.handlers.onboarding import handlers as onboarding_handlers
 
-from tgbot.states import BAN, BAN_LIST, END, CURRENT_LEVEL, START_OVER
+from tgbot.states import BAN, BAN_LIST, END, CURRENT_LEVEL, START_OVER, BANHAMMER_REPLY_MARKUP
 
 
 def banhammer_button_press(update: Update, context: CallbackContext) -> str:
@@ -20,12 +20,17 @@ def display_users(update: Update, context: CallbackContext, page: int = None):
     message_text = "Администратор может забанить/разбанить отдельных участников или целую группу разом."
     query = update.callback_query
     query.answer()
+    user_data = context.user_data 
     btn_captions = User.get_users_button_captions()
     rpl_mrkp = users_keyboard(btn_captions=btn_captions, page=page)
-    update.callback_query.edit_message_text(
-        text=message_text,
-        reply_markup=rpl_mrkp,
-    )
+    if not BANHAMMER_REPLY_MARKUP in user_data:
+        user_data[BANHAMMER_REPLY_MARKUP] = None
+    if user_data.get(BANHAMMER_REPLY_MARKUP) != rpl_mrkp:
+        user_data[BANHAMMER_REPLY_MARKUP] = rpl_mrkp
+        update.callback_query.edit_message_text(
+            text=message_text,
+            reply_markup=rpl_mrkp,
+        )
 
 
 def handle_callback(update: Update, context: CallbackContext):
