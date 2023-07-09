@@ -4,10 +4,11 @@ from telegram.ext import CallbackContext
 from users.models import User
 from .keyboards import users_keyboard
 from tgbot.handlers.onboarding import handlers as onboarding_handlers
-
+from tgbot.handlers.main import not_for_banned_users
 from tgbot.states import BAN, BAN_LIST, END, CURRENT_LEVEL, START_OVER, BANHAMMER_REPLY_MARKUP
 
 
+@not_for_banned_users
 def banhammer_button_press(update: Update, context: CallbackContext) -> str:
     context.user_data[CURRENT_LEVEL] = BAN
     display_users(update, context, page=1)
@@ -33,6 +34,7 @@ def display_users(update: Update, context: CallbackContext, page: int = None):
         )
 
 
+@not_for_banned_users
 def handle_callback(update: Update, context: CallbackContext):
     query = update.callback_query
     callback_data = query.data
@@ -90,6 +92,7 @@ def find_button_page(update: Update, callback_data: str) -> int:
     return int(page)
 
 
+@not_for_banned_users
 def end_banhammer(update: Update, context: CallbackContext) -> int:
     """End gathering of features and return to parent conversation."""
     user_data = context.user_data

@@ -37,9 +37,7 @@ class User(CreateUpdateTracker):
         max_length=64, **nb, verbose_name="Ссылка пользователя"
     )
     is_blocked_bot = models.BooleanField(default=False, verbose_name="Забанен ботом")
-
     is_admin = models.BooleanField(default=False, verbose_name="Администратор")
-
     objects = GetOrNoneManager()  # user = User.objects.get_or_none(user_id=<some_id>)
     admins = AdminUserManager()  # User.admins.all()
 
@@ -105,11 +103,12 @@ class User(CreateUpdateTracker):
 
     @classmethod
     def ban_all(cls):
-        users = cls.objects.all()
-        for user in users:
-            if not user.is_admin:
-                user.is_blocked_bot = True
-        User.objects.bulk_update(users, ["is_blocked_bot"])
+        if cls.objects.exists():
+            users = cls.objects.all()
+            for user in users:
+                if not user.is_admin:
+                    user.is_blocked_bot = True
+            User.objects.bulk_update(users, ["is_blocked_bot"])
         
     @classmethod
     def bulk_save_is_blocked_bot(cls):

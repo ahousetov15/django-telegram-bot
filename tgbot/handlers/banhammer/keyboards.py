@@ -1,4 +1,5 @@
 import copy
+import math
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup
 from typing import List
 from tgbot.states import END
@@ -31,22 +32,14 @@ def users_keyboard(btn_captions: List[dict], page: int) -> InlineKeyboardMarkup:
     
     # Добавить кнопки пагинации
     btn_count = len(btn_captions)
-    if btn_count <= ITEMS_PER_PAGE:
-        page_count = 1
-    else:
-        page_count = (btn_count%ITEMS_PER_PAGE)+1
+    page_count = 1 if btn_count <= ITEMS_PER_PAGE else math.ceil(btn_count/ITEMS_PER_PAGE)
         
-    # prev_button = InlineKeyboardButton(text=f"⬅️", callback_data=f"prev_{page}")
-    # counter = InlineKeyboardButton(text=f"{page}/{page_count}", callback_data=f"counter")
-    # next_button = InlineKeyboardButton(text="", callback_data=f"next_{page}")
     prev_button = InlineKeyboardButton(text=f"◀️◀️", callback_data=f"prev_{page}")
     counter = InlineKeyboardButton(text=f"{page}/{page_count}", callback_data=f"counter")
     next_button = InlineKeyboardButton(text=f"▶️▶️", callback_data=f"next_{page}")
-    # save_btn = InlineKeyboardButton(text=f"Сохранить", callback_data=f"save_ban")
     ban_all_btn = InlineKeyboardButton(text=f"Забанить всех", callback_data=f"ban_all")
     end_btn = InlineKeyboardButton(text=f"Назад", callback_data=str(END))
     keyboard.append([ban_all_btn])
-    # keyboard.append([save_btn])
     keyboard.append([prev_button, counter, next_button])
     keyboard.append([end_btn])
     # keyboard.append([prev_button, next_button])
