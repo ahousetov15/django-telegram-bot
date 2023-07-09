@@ -17,8 +17,10 @@ from .static_text import (
 )
 from users.models import User
 from users.tasks import broadcast_message
+from tgbot.handlers.main import not_for_banned_users
 
 
+@not_for_banned_users
 def broadcast_command_with_message(update: Update, context: CallbackContext):
     """Type /broadcast <some_text>. Then check your message in HTML format and broadcast to users."""
     u = User.get_user(update, context)
@@ -52,6 +54,7 @@ def broadcast_command_with_message(update: Update, context: CallbackContext):
             )
 
 
+@not_for_banned_users
 def broadcast_decision_handler(update: Update, context: CallbackContext) -> None:
     # callback_data: CONFIRM_DECLINE_BROADCAST variable from manage_data.py
     """Entered /broadcast <some_text>.

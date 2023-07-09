@@ -1,33 +1,16 @@
 import datetime
-
+from users.models import User
 from django.utils import timezone
-from telegram import (
-    ParseMode,
-    Update,
-    KeyboardButton,
-    ReplyKeyboardMarkup,
-    ReplyKeyboardRemove,
-)
-from telegram.ext import CallbackContext, ContextTypes, ConversationHandler
+from telegram import ParseMode, Update, ReplyKeyboardRemove
+from telegram.ext import CallbackContext, ConversationHandler
 from tgbot.states import *
 from tgbot.handlers.onboarding import static_text
 from tgbot.handlers.utils.info import extract_user_data_from_update
-from users.models import User
 from tgbot.handlers.onboarding.keyboards import make_keyboard_for_start_command
+from tgbot.handlers.main import not_for_banned_users
 
 
-# def command_start(update: Update, context: CallbackContext) -> None:
-#     u, created = User.get_user_and_created(update, context)
-
-#     if created:
-#         text = static_text.start_created_ru.format(first_name=u.first_name)
-#     else:
-#         text = static_text.start_not_created_ru.format(first_name=u.first_name)
-
-#     update.message.reply_text(text=text,
-#                               reply_markup=make_keyboard_for_start_command())
-
-
+@not_for_banned_users
 def command_start(update: Update, context: CallbackContext) -> None:
     u, created = User.get_user_and_created(update, context)
 
@@ -62,18 +45,15 @@ def command_start(update: Update, context: CallbackContext) -> None:
     return SELECTING_ACTION
 
 
+@not_for_banned_users
 def stop_main_conv(update: Update, context: CallbackContext) -> int:
     """End Conversation by command."""
-    # keyboard = [
-    #     [KeyboardButton("/start")]
-    # ]
-    # reply_markup = ReplyKeyboardMarkup(keyboard)
-    # context.bot.send_message(chat_id=update.effective_chat.id, text="До встречи!", reply_markup=reply_markup)
     context.user_data[CURRENT_LEVEL] = END
     context.bot.send_message(chat_id=update.effective_chat.id, text="До встречи!")
     return ConversationHandler.END
 
 
+@not_for_banned_users
 def end_buttton_clicked(update: Update, context: CallbackContext) -> int:
     """End conversation from InlineKeyboardButton."""
     # update.callback_query.answer()
@@ -84,13 +64,7 @@ def end_buttton_clicked(update: Update, context: CallbackContext) -> int:
     return END
 
 
-# def stop_nested(update: Update, context: CallbackContext) -> str:
-#     """Completely end conversation from within nested conversation."""
-#     update.message.reply_text("Okay, bye.")
-
-#     return STOPPING
-
-
+@not_for_banned_users
 def secret_level(update: Update, context: CallbackContext) -> None:
     # callback_data: SECRET_LEVEL_BUTTON variable from manage_data.py
     """Pressed 'secret_level_button_text' after /start command"""

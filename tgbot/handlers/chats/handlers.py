@@ -1,12 +1,6 @@
 from telegram import Update, InputFile, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 from chats.models import Chats
-from users.models import User
-from questions.models import Question
-from dtb.settings import MSK_TZ
-from utils.models import datetime_str
-from tgbot.handlers.utils.info import send_typing_action
-from tgbot.handlers.admin import static_text
 from .keyboards import keyboard_bot_chats
 from .static_text import (
     chat_exists_in_number,
@@ -25,8 +19,10 @@ from tgbot.states import (
     SHOWING,
 )
 from tgbot.handlers.onboarding import handlers as onboarding_handlers
+from tgbot.handlers.main import not_for_banned_users
 
 
+@not_for_banned_users
 def support_chat_button_press(update: Update, context: CallbackContext) -> str:
     context.user_data[CURRENT_LEVEL] = SUPPORT_CHAT
     message_text = "Бот устанавливает чаты поддержки: то куда пересылаются сообщения пользователей, для оперативной обратной связи."
@@ -43,6 +39,8 @@ def support_chat_button_press(update: Update, context: CallbackContext) -> str:
     return SUPPORT_CHAT
 
 
+
+@not_for_banned_users
 def list_sup_chat(update: Update, context: CallbackContext):
     context.user_data[CURRENT_LEVEL] = SUPPORT_CHAT
     query = update.callback_query
@@ -64,6 +62,7 @@ def list_sup_chat(update: Update, context: CallbackContext):
     return SELECT_SUPPORT_CHAT
 
 
+@not_for_banned_users
 def handle_support_chat(update: Update, context: CallbackContext):
     TARGET_CHAT_ID = Chats.get_support_chat_id()
     if (
@@ -103,6 +102,7 @@ def handle_support_chat(update: Update, context: CallbackContext):
         return SUPPORT_CHAT
 
 
+@not_for_banned_users
 def end_support_chat(update: Update, context: CallbackContext) -> int:
     """End gathering of features and return to parent conversation."""
     user_data = context.user_data

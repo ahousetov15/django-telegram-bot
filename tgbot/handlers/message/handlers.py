@@ -24,8 +24,10 @@ from .keyboards import (
     ask_question_or_no_question_keyboard,
     ask_question_or_back_keyboard,
 )
+from tgbot.handlers.main import not_for_banned_users
 
 
+@not_for_banned_users
 def ask_question_button_press(update: Update, context: CallbackContext) -> str:
     context.user_data[CURRENT_LEVEL] = QUESTION
     message_text = "Вы можете задать вопросы ведущему. Они будут сохранены и вы получите ответ, когда ведущий освободиться."
@@ -64,6 +66,7 @@ def ask_question_button_press(update: Update, context: CallbackContext) -> str:
 #     return ASKING_QUESTION
 
 
+@not_for_banned_users
 def asking_question(update: Update, context: CallbackContext) -> str:
     """Prompt user to input data for selected feature."""
     # context.user_data[CURRENT_FEATURE] = update.callback_query.data
@@ -78,7 +81,7 @@ def asking_question(update: Update, context: CallbackContext) -> str:
     return TYPING
 
 
-@send_typing_action
+@not_for_banned_users
 def export_questions(update: Update, context: CallbackContext):
     (
         file_name,
@@ -132,6 +135,7 @@ def notification_formatting(update: Update):
     return result
 
 
+@not_for_banned_users
 def handle_only_questions(update: Update, context: CallbackContext) -> str:
     TARGET_CHAT_ID = Chats.get_support_chat_id()
     if (
@@ -165,6 +169,7 @@ def handle_only_questions(update: Update, context: CallbackContext) -> str:
     return ASKING_QUESTION
 
 
+@not_for_banned_users
 def handle_message_or_question(update: Update, context: CallbackContext):
     TARGET_CHAT_ID = Chats.get_support_chat_id()
     if (
@@ -202,6 +207,7 @@ def handle_message_or_question(update: Update, context: CallbackContext):
                     )
 
 
+@not_for_banned_users
 def end_asking_question(update: Update, context: CallbackContext) -> int:
     """End gathering of features and return to parent conversation."""
     user_data = context.user_data

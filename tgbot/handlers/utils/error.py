@@ -8,8 +8,10 @@ from telegram.ext import CallbackContext
 
 from dtb.settings import TELEGRAM_LOGS_CHAT_ID
 from users.models import User
+from tgbot.handlers.main import not_for_banned_users
 
 
+@not_for_banned_users
 def send_stacktrace_to_tg_chat(update: Update, context: CallbackContext) -> None:
     u = User.get_user(update, context)
 

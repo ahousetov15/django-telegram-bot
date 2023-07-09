@@ -33,13 +33,13 @@
     'file_unique_id': 'AgADmggAAgnBgEg', 'file_size': 1260506}, 'caption': '50603'
 }
 """
-from typing import Dict
-
 import telegram
+from typing import Dict
 from telegram import Update
 from telegram.ext import CallbackContext
-
 from users.models import User
+from tgbot.handlers.main import not_for_banned_users
+
 
 ALL_TG_FILE_TYPES = [
     "document",
@@ -65,6 +65,7 @@ def _get_file_id(m: Dict) -> str:
         return best_photo["file_id"]
 
 
+@not_for_banned_users
 def show_file_id(update: Update, context: CallbackContext) -> None:
     """Returns file_id of the attached file/media"""
     u = User.get_user(update, context)
