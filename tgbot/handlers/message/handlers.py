@@ -93,7 +93,11 @@ def export_questions(update: Update, context: CallbackContext):
     removed = Question.remove_question()
     u = User.get_user(update, context)
     if not u.is_admin:
-        update.message.reply_text(static_text.only_for_admins_ru)
+        context.bot.send_message(
+            chat_id=u.user_id,
+            text=static_text.only_for_admins_ru,
+        )
+        # update.message.reply_text(static_text.only_for_admins_ru)
         return
     if excel_questions:
         with excel_questions as file:
@@ -172,39 +176,34 @@ def handle_only_questions(update: Update, context: CallbackContext) -> str:
 @not_for_banned_users
 def handle_message_or_question(update: Update, context: CallbackContext):
     TARGET_CHAT_ID = Chats.get_support_chat_id()
-    if (
-        "waiting_for_question" in context.user_data
-        and context.user_data["waiting_for_question"]
-    ):
+    if ("waiting_for_question" in context.user_data and context.user_data["waiting_for_question"]):
         return handle_only_questions(update, context)
     else:
         cur_lvl = context.user_data.get("CURRENT_LEVEL")
+        msg_text = update.message
+        if msg_text:
+            msg_text = msg_text.text 
         if not cur_lvl or cur_lvl == END:
             not_in_conv_buttons.handle_button_press(update, context)
-        else:
-            if cur_lvl == QUESTION:
+        elif cur_lvl == QUESTION:
                 update.message.reply_text(
                     text="Нажмите 'Задать вопрос' чтобы задать вопрос ведущему или 'Назад' чтобы вернуться в основное меню.",
                     reply_to_message_id=update.message.message_id,
                     reply_markup=ask_question_or_back_keyboard(),
                 )
-            elif cur_lvl == END:
-                not_in_conv_buttons.handle_button_press()
-            if cur_lvl not in STATES_NO_CHAT_SUPPORT:
-                if TARGET_CHAT_ID:
-                    context.bot.send_message(
-                        chat_id=TARGET_CHAT_ID, text=message_formatting(update)
-                    )
-                    update.message.reply_text(
-                        text="Ваше сообщение было направленно в чат поддержки.",
-                        reply_to_message_id=update.message.message_id,
-                    )
-                else:
-                    User.notify_admins(
-                        update=update,
-                        context=context,
-                        message=notification_formatting(update=update),
-                    )
+        elif cur_lvl not in STATES_NO_CHAT_SUPPORT:
+            if TARGET_CHAT_ID:
+                context.bot.send_message(chat_id=TARGET_CHAT_ID, text=message_formatting(update))
+                update.message.reply_text(
+                    text="Ваше сообщение было направленно в чат поддержки.",
+                    reply_to_message_id=update.message.message_id,
+                )
+            else:
+                User.notify_admins(
+                    update=update,
+                    context=context,
+                    message=notification_formatting(update=update),
+                )
 
 
 @not_for_banned_users
