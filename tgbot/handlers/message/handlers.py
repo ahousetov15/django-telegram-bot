@@ -1,13 +1,13 @@
-from telegram import Update, InputFile, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import CallbackContext, ContextTypes
-from chats.models import Chats
-from users.models import User
+from telegram import Update, InputFile
+from telegram.ext import CallbackContext
+from chats.models import Chats, User
 from questions.models import Question
 from dtb.settings import MSK_TZ
 from utils.models import datetime_str
 from tgbot.handlers.admin import static_text
 from tgbot.handlers.onboarding import handlers as onboarding_handlers
 from tgbot.handlers.buttons import not_in_conv_buttons
+from tgbot.handlers.main import not_for_banned_users
 from tgbot.states import (
     ASK_QUESTION,
     ASKING_QUESTION,
@@ -25,7 +25,6 @@ from .keyboards import (
     ask_question_or_no_question_keyboard,
     ask_question_or_back_keyboard,
 )
-from tgbot.handlers.main import not_for_banned_users
 
 
 @not_for_banned_users

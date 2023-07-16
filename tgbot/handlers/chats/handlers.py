@@ -1,4 +1,4 @@
-from telegram import Update, InputFile, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 from chats.models import Chats
 from .keyboards import keyboard_bot_chats

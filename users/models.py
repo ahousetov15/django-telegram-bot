@@ -1,19 +1,18 @@
-from __future__ import annotations
 import logging
+# from __future__ import annotations
 from typing import Union, Optional, Tuple, List
 from django.db import models
 from django.db.models import QuerySet, Manager
-from telegram import Update, Bot, error
+from telegram import Update
 from telegram.ext import CallbackContext
 from tgbot.handlers.admin import static_text
-from tgbot.handlers.utils.info import (
-    extract_user_data_from_update,
-    extract_new_chat_members_from_update,
-)
+from tgbot.handlers.utils.info import extract_user_data_from_update, extract_new_chat_members_from_update
 from utils.models import CreateUpdateTracker, nb, CreateTracker, GetOrNoneManager
 from dtb.settings import ADMINS_BY_DEFAULT
 from tgbot.handlers.admin.static_text import welcome_message
-from .keyboards import welcome_user_keyboard
+from users.keyboards import welcome_user_keyboard
+# from users.models import User
+
 
 
 class AdminUserManager(Manager):
@@ -70,22 +69,14 @@ class User(CreateUpdateTracker):
         data_list = extract_new_chat_members_from_update(update)
         # created_users = []
         for user in data_list:
-            u, created = cls.objects.update_or_create(
-                user_id=user["user_id"], defaults=user
-            )
+            u, created = cls.objects.update_or_create(user_id=user["user_id"], defaults=user)
             if created:
                 if str(user["user_id"]) in ADMINS_BY_DEFAULT:
                     u.is_admin = True
                 # Save deep_link to User model
-                if (
-                    context is not None
-                    and context.args is not None
-                    and len(context.args) > 0
-                ):
+                if (context is not None and context.args is not None and len(context.args) > 0):
                     payload = context.args[0]
-                    if (
-                        str(payload).strip() != str(user["user_id"]).strip()
-                    ):  # you can't invite yourself
+                    if (str(payload).strip() != str(user["user_id"]).strip()):  # you can't invite yourself
                         u.deep_link = payload
                 u.save()
                 # User.send_welcome_message_and_keyboard(user=u, update=update, context=context)
@@ -132,30 +123,19 @@ class User(CreateUpdateTracker):
         return btn_captions
 
     @classmethod
-    def get_user_and_created(
-        cls, update: Update, context: CallbackContext
-    ) -> Tuple[User, bool]:
+    def get_user_and_created(cls, update: Update, context: CallbackContext):
         """python-telegram-bot's Update, Context --> User instance"""
         data = extract_user_data_from_update(update)
-        u, created = cls.objects.update_or_create(
-            user_id=data["user_id"], defaults=data
-        )
+        u, created = cls.objects.update_or_create(user_id=data["user_id"], defaults=data)
         if created:
             if str(data["user_id"]) in ADMINS_BY_DEFAULT:
                 u.is_admin = True
             # Save deep_link to User model
-            if (
-                context is not None
-                and context.args is not None
-                and len(context.args) > 0
-            ):
+            if (context is not None and context.args is not None and len(context.args) > 0):
                 payload = context.args[0]
-                if (
-                    str(payload).strip() != str(data["user_id"]).strip()
-                ):  # you can't invite yourself
+                if (str(payload).strip() != str(data["user_id"]).strip()):  # you can't invite yourself
                     u.deep_link = payload
             u.save()
-
         return u, created
 
     @classmethod
@@ -165,7 +145,7 @@ class User(CreateUpdateTracker):
         return users_id_list
 
     @classmethod
-    def get_user(cls, update: Update, context: CallbackContext) -> User:
+    def get_user(cls, update: Update, context: CallbackContext):
         u, _ = cls.get_user_and_created(update, context)
         return u
 
@@ -203,9 +183,7 @@ class User(CreateUpdateTracker):
     #             logging.error(f"Непонятное исключение.", exc_info=str(e))
 
     @classmethod
-    def get_user_by_username_or_user_id(
-        cls, username_or_user_id: Union[str, int]
-    ) -> Optional[User]:
+    def get_user_by_username_or_user_id(cls, username_or_user_id: Union[str, int]):
         """Search user in DB, return User or None if not found"""
         username = str(username_or_user_id).replace("@", "").strip().lower()
         if username.isdigit():  # user_id
@@ -213,20 +191,14 @@ class User(CreateUpdateTracker):
         return cls.objects.filter(username__iexact=username).first()
 
     @property
-    def invited_users(self) -> QuerySet[User]:
-        return User.objects.filter(
-            deep_link=str(self.user_id), created_at__gt=self.created_at
-        )
+    def invited_users(self):
+        return User.objects.filter(deep_link=str(self.user_id), created_at__gt=self.created_at)
 
     @property
     def tg_str(self) -> str:
         if self.username:
             return f"@{self.username}"
-        return (
-            f"{self.first_name} {self.last_name}"
-            if self.last_name
-            else f"{self.first_name}"
-        )
+        return f"{self.first_name} {self.last_name}" if self.last_name else f"{self.first_name}"
 
 
 class Location(CreateTracker):
