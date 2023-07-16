@@ -164,7 +164,7 @@ class User(CreateUpdateTracker):
         """
         u = User.get_user(update, context)
         if not u.is_admin:
-            update.message.reply_text(static_text.only_for_admins_ru)
+            context.bot.send_message(chat_id=u.user_id, text=static_text.only_for_admins_ru)
         return u.is_admin
 
     # @classmethod

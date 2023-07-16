@@ -15,7 +15,10 @@ def admin(update: Update, context: CallbackContext) -> None:
     """Show help info about all secret admins commands"""
     u = User.get_user(update, context)
     if not u.is_admin:
-        update.message.reply_text(static_text.only_for_admins_ru)
+        context.bot.send_message(
+            chat_id=u.user_id,
+            text=static_text.only_for_admins_ru,
+        )
         return
     update.message.reply_text(static_text.secret_admin_commands)
 

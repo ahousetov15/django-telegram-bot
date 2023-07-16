@@ -11,7 +11,6 @@ from tgbot.handlers.main import not_for_banned_users, only_for_admin
 
 
 @not_for_banned_users
-@only_for_admin
 def command_start(update: Update, context: CallbackContext) -> None:
     u, created = User.get_user_and_created(update, context)
 
@@ -48,7 +47,6 @@ def command_start(update: Update, context: CallbackContext) -> None:
 
 
 @not_for_banned_users
-@only_for_admin
 def stop_main_conv(update: Update, context: CallbackContext) -> int:
     """End Conversation by command."""
     context.user_data[CURRENT_LEVEL] = END
@@ -57,7 +55,6 @@ def stop_main_conv(update: Update, context: CallbackContext) -> int:
 
 
 @not_for_banned_users
-@only_for_admin
 def end_buttton_clicked(update: Update, context: CallbackContext) -> str:
     """End conversation from InlineKeyboardButton."""
     return END

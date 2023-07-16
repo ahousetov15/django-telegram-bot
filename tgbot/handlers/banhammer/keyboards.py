@@ -20,7 +20,7 @@ def users_keyboard(btn_captions: List[dict], page: int) -> InlineKeyboardMarkup:
         btn_text = f"{item['first_name']}_{item['last_name']}"
         callback_data_text = f"{item['user_id']}"
         if item['is_blocked_bot']:
-            btn_text+=f"🚫"
+            btn_text = f"🚫{btn_text}"
         button = InlineKeyboardButton(text=btn_text, callback_data=f"item_{callback_data_text}")
         if len(row) == ITEMS_PER_LINE:
             keyboard.append([btn for btn in row])
