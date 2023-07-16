@@ -5,6 +5,7 @@ from django.db import models
 from django.db.models import QuerySet, Manager
 from telegram import Update, Bot, error
 from telegram.ext import CallbackContext
+from tgbot.handlers.admin import static_text
 from tgbot.handlers.utils.info import (
     extract_user_data_from_update,
     extract_new_chat_members_from_update,
@@ -173,6 +174,18 @@ class User(CreateUpdateTracker):
         if admins_dict := cls.get_admins_dict():
             for admin_chat_id, admin_values in admins_dict.items():
                 context.bot.send_message(chat_id=admin_chat_id, text=message)
+
+    @classmethod
+    def is_user_admin(cls, update: Update, context: CallbackContext):
+        """
+        Send 'only for admins' in case non admin user try to access and return False.
+        
+        Retunr True in otherwise
+        """
+        u = User.get_user(update, context)
+        if not u.is_admin:
+            update.message.reply_text(static_text.only_for_admins_ru)
+        return u.is_admin
 
     # @classmethod
     # def send_welcome_message_and_keyboard(cls, user: User, update: Update, context: CallbackContext):

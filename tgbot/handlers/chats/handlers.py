@@ -19,10 +19,10 @@ from tgbot.states import (
     SHOWING,
 )
 from tgbot.handlers.onboarding import handlers as onboarding_handlers
-from tgbot.handlers.main import not_for_banned_users
-
+from tgbot.handlers.main import not_for_banned_users, only_for_admin
 
 @not_for_banned_users
+@only_for_admin
 def support_chat_button_press(update: Update, context: CallbackContext) -> str:
     context.user_data[CURRENT_LEVEL] = SUPPORT_CHAT
     message_text = "Бот устанавливает чаты поддержки: то куда пересылаются сообщения пользователей, для оперативной обратной связи."
@@ -41,6 +41,7 @@ def support_chat_button_press(update: Update, context: CallbackContext) -> str:
 
 
 @not_for_banned_users
+@only_for_admin
 def list_sup_chat(update: Update, context: CallbackContext):
     context.user_data[CURRENT_LEVEL] = SUPPORT_CHAT
     query = update.callback_query
@@ -63,6 +64,7 @@ def list_sup_chat(update: Update, context: CallbackContext):
 
 
 @not_for_banned_users
+@only_for_admin
 def handle_support_chat(update: Update, context: CallbackContext):
     TARGET_CHAT_ID = Chats.get_support_chat_id()
     if (
@@ -103,16 +105,15 @@ def handle_support_chat(update: Update, context: CallbackContext):
 
 
 @not_for_banned_users
+@only_for_admin
 def end_support_chat(update: Update, context: CallbackContext) -> int:
     """End gathering of features and return to parent conversation."""
     user_data = context.user_data
     level = user_data[CURRENT_LEVEL]
-
     # Print upper level menu
     if level == SUPPORT_CHAT:
         user_data[START_OVER] = True
         onboarding_handlers.command_start(update, context)
     else:
         list_sup_chat(update, context)
-
     return END

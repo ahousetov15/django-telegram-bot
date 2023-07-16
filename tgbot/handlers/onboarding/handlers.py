@@ -7,10 +7,11 @@ from tgbot.states import *
 from tgbot.handlers.onboarding import static_text
 from tgbot.handlers.utils.info import extract_user_data_from_update
 from tgbot.handlers.onboarding.keyboards import make_keyboard_for_start_command
-from tgbot.handlers.main import not_for_banned_users
+from tgbot.handlers.main import not_for_banned_users, only_for_admin
 
 
 @not_for_banned_users
+@only_for_admin
 def command_start(update: Update, context: CallbackContext) -> None:
     u, created = User.get_user_and_created(update, context)
 
@@ -45,7 +46,9 @@ def command_start(update: Update, context: CallbackContext) -> None:
     return SELECTING_ACTION
 
 
+
 @not_for_banned_users
+@only_for_admin
 def stop_main_conv(update: Update, context: CallbackContext) -> int:
     """End Conversation by command."""
     context.user_data[CURRENT_LEVEL] = END
@@ -54,17 +57,14 @@ def stop_main_conv(update: Update, context: CallbackContext) -> int:
 
 
 @not_for_banned_users
-def end_buttton_clicked(update: Update, context: CallbackContext) -> int:
+@only_for_admin
+def end_buttton_clicked(update: Update, context: CallbackContext) -> str:
     """End conversation from InlineKeyboardButton."""
-    # update.callback_query.answer()
-
-    # text = "See you around!"
-    # update.callback_query.edit_message_text(text=text)
-    # context.bot.send_message(chat_id=update.effective_chat.id, text="/stop")
     return END
 
 
 @not_for_banned_users
+@only_for_admin
 def secret_level(update: Update, context: CallbackContext) -> None:
     # callback_data: SECRET_LEVEL_BUTTON variable from manage_data.py
     """Pressed 'secret_level_button_text' after /start command"""

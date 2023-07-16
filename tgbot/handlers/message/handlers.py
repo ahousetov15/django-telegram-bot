@@ -5,7 +5,6 @@ from users.models import User
 from questions.models import Question
 from dtb.settings import MSK_TZ
 from utils.models import datetime_str
-from tgbot.handlers.utils.info import send_typing_action
 from tgbot.handlers.admin import static_text
 from tgbot.handlers.onboarding import handlers as onboarding_handlers
 from tgbot.handlers.buttons import not_in_conv_buttons
@@ -19,6 +18,8 @@ from tgbot.states import (
     END,
     CURRENT_LEVEL,
     STATES_NO_CHAT_SUPPORT,
+    START_COMMAND,
+    STOP_COMMAND
 )
 from .keyboards import (
     ask_question_or_no_question_keyboard,
@@ -173,6 +174,8 @@ def handle_only_questions(update: Update, context: CallbackContext) -> str:
     return ASKING_QUESTION
 
 
+
+
 @not_for_banned_users
 def handle_message_or_question(update: Update, context: CallbackContext):
     TARGET_CHAT_ID = Chats.get_support_chat_id()
@@ -181,9 +184,28 @@ def handle_message_or_question(update: Update, context: CallbackContext):
     else:
         cur_lvl = context.user_data.get("CURRENT_LEVEL")
         msg_text = update.message
+        is_start_cmd, is_stop_cmd = None, None 
         if msg_text:
             msg_text = msg_text.text 
-        if not cur_lvl or cur_lvl == END:
+            is_start_cmd = msg_text == START_COMMAND
+            is_stop_cmd = msg_text == STOP_COMMAND
+        
+         
+        if is_start_cmd ^ is_stop_cmd: 
+            """
+            Если пришла команда то отрабатываю ее вне зависимости от того
+            в каком состоянии находится бот. Исхожу из того, что есть обработка команды дошла до сюда, 
+            то уже надо рубить с плеча
+            """ 
+            if is_start_cmd:
+                onboarding_handlers.command_start(update, context)
+            else:
+                onboarding_handlers.stop_main_conv(update, context)
+        elif not cur_lvl or cur_lvl == END:
+            """
+            Здесь случай, когда никакого уровня(стейта) нет. Значит беседа не начата вообще или уже окончена. 
+            Уведомляем пользователя, что хорошо бы перезапустить.
+            """ 
             not_in_conv_buttons.handle_button_press(update, context)
         elif cur_lvl == QUESTION:
                 update.message.reply_text(

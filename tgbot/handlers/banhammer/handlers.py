@@ -4,19 +4,22 @@ from telegram.ext import CallbackContext
 from users.models import User
 from .keyboards import users_keyboard
 from tgbot.handlers.onboarding import handlers as onboarding_handlers
-from tgbot.handlers.main import not_for_banned_users
+from tgbot.handlers.main import not_for_banned_users, only_for_admin
 from tgbot.states import BAN, BAN_LIST, END, CURRENT_LEVEL, START_OVER, BANHAMMER_REPLY_MARKUP
 
 
+
 @not_for_banned_users
+@only_for_admin
 def banhammer_button_press(update: Update, context: CallbackContext) -> str:
-    context.user_data[CURRENT_LEVEL] = BAN
-    display_users(update, context, page=1)
-    user_data = context.user_data
-    user_data[CURRENT_LEVEL] = BAN_LIST 
-    return BAN_LIST
-
-
+    if User.is_user_admin(update=update, context=context):
+        context.user_data[CURRENT_LEVEL] = BAN
+        display_users(update, context, page=1)
+        user_data = context.user_data
+        user_data[CURRENT_LEVEL] = BAN_LIST
+        return BAN_LIST
+	
+	
 def display_users(update: Update, context: CallbackContext, page: int = None):
     message_text = "Администратор может забанить/разбанить отдельных участников или целую группу разом."
     query = update.callback_query
@@ -35,6 +38,7 @@ def display_users(update: Update, context: CallbackContext, page: int = None):
 
 
 @not_for_banned_users
+@only_for_admin
 def handle_callback(update: Update, context: CallbackContext):
     query = update.callback_query
     callback_data = query.data
@@ -93,6 +97,7 @@ def find_button_page(update: Update, callback_data: str) -> int:
 
 
 @not_for_banned_users
+@only_for_admin
 def end_banhammer(update: Update, context: CallbackContext) -> int:
     """End gathering of features and return to parent conversation."""
     user_data = context.user_data
@@ -104,5 +109,4 @@ def end_banhammer(update: Update, context: CallbackContext) -> int:
         onboarding_handlers.command_start(update, context)
     else:
         banhammer_button_press(update, context)
-
     return END
