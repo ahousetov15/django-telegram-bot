@@ -43,6 +43,11 @@ def handle_callback(update: Update, context: CallbackContext):
     query = update.callback_query
     callback_data = query.data
     new_page = 1
+    who_try_ban = None 
+    try:
+        who_try_ban = update.effective_user
+    except Exception as e:
+        print(f"There is no 'effective_user' in update")
     if callback_data.startswith("prev_"):
         # Обработка нажатия на кнопку "Previous"
         page = int(callback_data.split("_")[1])
@@ -64,9 +69,16 @@ def handle_callback(update: Update, context: CallbackContext):
         user_id = callback_data[5:]
         u = User.get_user_by_user_id(user_id=user_id)
         if u:
-            u.is_blocked_bot = not u.is_blocked_bot
-            u.save()
-            new_page = find_button_page(update=update, callback_data=callback_data)
+            if u.user_id == who_try_ban.id:
+                context.bot.send_message(
+                    chat_id=u.user_id,
+                    text="Не получится забанить самого себя 🙂",
+                )
+                return
+            else:
+                u.is_blocked_bot = not u.is_blocked_bot
+                u.save()
+                new_page = find_button_page(update=update, callback_data=callback_data)
     display_users(update, context, new_page)    
 
 
