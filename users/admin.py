@@ -16,6 +16,7 @@ from tgbot.handlers.broadcast_message.utils import send_one_message
 class UserAdmin(admin.ModelAdmin):
     list_display = [
         "is_admin",
+        "is_blocked_bot",
         "user_id",
         "username",
         "first_name",
@@ -24,7 +25,6 @@ class UserAdmin(admin.ModelAdmin):
         "deep_link",
         "created_at",
         "updated_at",
-        "is_blocked_bot",
     ]
     list_filter = [
         "is_blocked_bot",

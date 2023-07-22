@@ -22,22 +22,22 @@ class AdminUserManager(Manager):
 
 class User(CreateUpdateTracker):
     user_id = models.PositiveBigIntegerField(
-        primary_key=True, verbose_name="Номер пользователя"
+        primary_key=True, verbose_name="Номер"
     )  # telegram_id
     username = models.CharField(max_length=32, **nb, verbose_name="Никнейм")
     first_name = models.CharField(max_length=256, **nb, verbose_name="Имя")
     last_name = models.CharField(max_length=256, **nb, verbose_name="Фамилия")
     language_code = models.CharField(
         max_length=8,
-        help_text="Язык пользователя",
-        verbose_name="Язык пользователя",
+        help_text="Язык",
+        verbose_name="Язык",
         **nb,
     )
     deep_link = models.CharField(
-        max_length=64, **nb, verbose_name="Ссылка пользователя"
+        max_length=64, **nb, verbose_name="Ссылка"
     )
-    is_blocked_bot = models.BooleanField(default=False, verbose_name="Забанен ботом")
-    is_admin = models.BooleanField(default=False, verbose_name="Администратор")
+    is_blocked_bot = models.BooleanField(default=False, verbose_name="Забанен(а)")
+    is_admin = models.BooleanField(default=False, verbose_name="Админ")
     objects = GetOrNoneManager()  # user = User.objects.get_or_none(user_id=<some_id>)
     admins = AdminUserManager()  # User.admins.all()
 
