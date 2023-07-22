@@ -12,12 +12,12 @@ def not_for_banned_users(func):
             u, created = User.get_user_and_created(upd, cntx)
             if created or (not u.is_blocked_bot):
                 result = func(*args, **kwargs)
+                return result
             else:
-                context.bot.send_message(
+                cntx.bot.send_message(
                     chat_id=u.user_id,
                     text=f"Администратор ограчил ваш доступ к возможностям бота.",
                 )
-            return result
     return inner
 
 
