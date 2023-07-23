@@ -8,6 +8,7 @@ from tgbot.handlers.admin import static_text
 from tgbot.handlers.onboarding import handlers as onboarding_handlers
 from tgbot.handlers.buttons import not_in_conv_buttons
 from tgbot.handlers.main import not_for_banned_users
+from dtb.settings import ADMINS_BY_DEFAULT
 from tgbot.states import (
     ASK_QUESTION,
     ASKING_QUESTION,
@@ -90,7 +91,6 @@ def export_questions(update: Update, context: CallbackContext):
         first_date,
         last_date,
     ) = Question.export_question_to_excel()
-    removed = Question.remove_question()
     u = User.get_user(update, context)
     if not u.is_admin:
         context.bot.send_message(
@@ -107,6 +107,11 @@ def export_questions(update: Update, context: CallbackContext):
                 document=InputFile(file, filename=file_name),
                 caption=caption,
             )
+        if u.user_id in ADMINS_BY_DEFAULT:
+            """
+            Удаляю вопросы из таблицы, только если их скачали администраторы по умолчанию
+            """
+            removed = Question.remove_question()
     else:
         context.bot.send_message(chat_id=u.user_id, text=file_name)
 
