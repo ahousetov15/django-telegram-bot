@@ -176,7 +176,7 @@ def setup_dispatcher(dp):
 
     selection_handlers = [
         ask_question_conv,
-        support_chats_conv,
+        # support_chats_conv,
         CallbackQueryHandler(
             message_handlers.export_questions, pattern="^" + str(EXPORT_QUESTIONS) + "$"
         ),
