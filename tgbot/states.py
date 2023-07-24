@@ -1,4 +1,5 @@
-START_OVER = False
+# START_OVER = False
+START_OVER = 'START_OVER'
 ACTIVATE = False
 # STATES
 (

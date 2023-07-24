@@ -50,7 +50,20 @@ def stats(update: Update, context: CallbackContext) -> None:
 def export_users(update: Update, context: CallbackContext) -> None:
     u = User.get_user(update, context)
     if not u.is_admin:
-        update.message.reply_text(static_text.only_for_admins)
+        if update:
+            message_attr = getattr(update, 'message')
+            if message_attr:
+                update.message.reply_text(static_text.only_for_admins)
+            else:
+                context.bot.send_message(
+                    chat_id=u.user_id,
+                    text=static_text.only_for_admins_ru,
+                )       
+        else:
+            context.bot.send_message(
+                chat_id=u.user_id,
+                text=static_text.only_for_admins_ru,
+            )   
         return
 
     # in values argument you can specify which fields should be returned in output csv

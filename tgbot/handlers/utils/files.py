@@ -74,6 +74,7 @@ def show_file_id(update: Update, context: CallbackContext) -> None:
         update_json = update.to_dict()
         file_id = _get_file_id(update_json["message"])
         message_id = update_json["message"]["message_id"]
+        context.bot.send_message
         update.message.reply_text(
             text=f"`{file_id}`",
             parse_mode=telegram.ParseMode.HTML,

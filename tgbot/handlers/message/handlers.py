@@ -1,4 +1,4 @@
-from telegram import Update, InputFile
+from telegram import Update, InputFile, error
 from telegram.ext import CallbackContext
 from chats.models import Chats, User
 from questions.models import Question
@@ -136,7 +136,7 @@ def message_formatting(update: Update):
 
 def notification_formatting(update: Update):
     result = f"#уведомление администратору\n\n"
-    result = f"получено сообщение или вопрос от пользователя, но чат поддержки не указан. Пожалуйста, укажите чат поддержки или все сообщения будут пересылаться сюда.\n\n"
+    result = f"получено сообщение или вопрос от пользователя, но чат поддержки не указан ИЛИ указан неверно. Пожалуйста, укажите чат поддержки или все сообщения будут пересылаться сюда.\n\n"
     result += f"от пользователя: {update.message.from_user.full_name}\n"
     result += f"логин: {update.message.from_user.name}\n"
     result += f"отправлено в {update.message.date.astimezone(MSK_TZ).strftime('%Y-%m-%d %H:%M:%S')} по Москве"
@@ -154,10 +154,20 @@ def handle_only_questions(update: Update, context: CallbackContext) -> str:
         new_question, created = Question.add_question(update=update, context=context)
         if created:
             if TARGET_CHAT_ID:
-                print(f"tgbot/handlers/message/handlers.py : {context}")
-                context.bot.send_message(
-                    chat_id=TARGET_CHAT_ID, text=question_formatting(update)
-                )
+                print(f"tgbot/handlers/message/handlers.py: context : {context}")
+                print(f"tgbot/handlers/message/handlers.py: TARGET_CHAT_ID : {TARGET_CHAT_ID}")
+                print(f"tgbot/handlers/message/handlers.py: update : {update}")
+                try:
+                    context.bot.send_message(
+                        chat_id=TARGET_CHAT_ID, text=question_formatting(update)
+                    )
+                except error.BadRequest as Br:
+                    print(f"Плохой запрос на отправку: {Br}")
+                    User.notify_admins(
+                        update=update,
+                        context=context,
+                        message=notification_formatting(update=update),
+                    )
             else:
                 User.notify_admins(
                     update=update,
@@ -170,10 +180,15 @@ def handle_only_questions(update: Update, context: CallbackContext) -> str:
         else:
             text = "По какой-то причине, ваш запрос не отправлен."
 
-        update.message.reply_text(
-            text=text,
-            reply_to_message_id=update.message.message_id,
-            reply_markup=ask_question_or_no_question_keyboard(),
+        # update.message.reply_text(
+        #     text=text,
+        #     reply_to_message_id=update.message.message_id,
+        #     reply_markup=ask_question_or_no_question_keyboard(),
+        # )
+        context.bot.send_message(
+            chat_id=TARGET_CHAT_ID, 
+            reply_to_message_id=update.message.message_id, 
+            text=question_formatting(update)
         )
         context.user_data["waiting_for_question"] = False
     return ASKING_QUESTION
@@ -213,18 +228,27 @@ def handle_message_or_question(update: Update, context: CallbackContext):
             """ 
             not_in_conv_buttons.handle_button_press(update, context)
         elif cur_lvl == QUESTION:
-                update.message.reply_text(
+                context.bot.send_message(
                     text="Нажмите 'Задать вопрос' чтобы задать вопрос ведущему или 'Назад' чтобы вернуться в основное меню.",
                     reply_to_message_id=update.message.message_id,
                     reply_markup=ask_question_or_back_keyboard(),
-                )
+                )      
+                # update.message.reply_text(
+                #     text="Нажмите 'Задать вопрос' чтобы задать вопрос ведущему или 'Назад' чтобы вернуться в основное меню.",
+                #     reply_to_message_id=update.message.message_id,
+                #     reply_markup=ask_question_or_back_keyboard(),
+                # )
         elif cur_lvl not in STATES_NO_CHAT_SUPPORT:
             if TARGET_CHAT_ID:
                 context.bot.send_message(chat_id=TARGET_CHAT_ID, text=message_formatting(update))
-                update.message.reply_text(
+                context.bot.send_message(
                     text="Ваше сообщение было направленно в чат поддержки.",
-                    reply_to_message_id=update.message.message_id,
+                    reply_to_message_id=update.message.message_id
                 )
+                # update.message.reply_text(
+                #     text="Ваше сообщение было направленно в чат поддержки.",
+                #     reply_to_message_id=update.message.message_id,
+                # )
             else:
                 User.notify_admins(
                     update=update,

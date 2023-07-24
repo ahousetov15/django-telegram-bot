@@ -113,7 +113,7 @@ ASGI_APPLICATION = "dtb.asgi.application"
 #         },
 #     }
 # }
-# Для DEBUGа
+# # Для DEBUGа
 # DATABASES = {
 #     "default": {
 #         "ENGINE": "django.db.backends.postgresql_psycopg2",
