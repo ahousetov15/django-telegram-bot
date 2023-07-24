@@ -116,7 +116,7 @@ def export_questions(update: Update, context: CallbackContext):
         context.bot.send_message(chat_id=u.user_id, text=file_name)
 
 
-def question_formatting(update: Update):
+def question_form(update: Update):
     result = f"#вопрос\n"
     result += f"от пользователя: {update.message.from_user.full_name}\n"
     result += f"логин: {update.message.from_user.name}\n"
@@ -125,7 +125,7 @@ def question_formatting(update: Update):
     return result
 
 
-def message_formatting(update: Update):
+def message_form(update: Update):
     result = f"#сообщение\n"
     result += f"от пользователя: {update.message.from_user.full_name}\n"
     result += f"логин: {update.message.from_user.name}\n"
@@ -134,7 +134,7 @@ def message_formatting(update: Update):
     return result
 
 
-def notification_formatting(update: Update):
+def notification_form(update: Update):
     result = f"#уведомление администратору\n\n"
     result = f"получено сообщение или вопрос от пользователя, но чат поддержки не указан ИЛИ указан неверно. Пожалуйста, укажите чат поддержки или все сообщения будут пересылаться сюда.\n\n"
     result += f"от пользователя: {update.message.from_user.full_name}\n"
@@ -159,20 +159,20 @@ def handle_only_questions(update: Update, context: CallbackContext) -> str:
                 print(f"tgbot/handlers/message/handlers.py: update : {update}")
                 try:
                     context.bot.send_message(
-                        chat_id=TARGET_CHAT_ID, text=question_formatting(update)
+                        chat_id=TARGET_CHAT_ID, text=question_form(update)
                     )
                 except error.BadRequest as Br:
                     print(f"Плохой запрос на отправку: {Br}")
                     User.notify_admins(
                         update=update,
                         context=context,
-                        message=notification_formatting(update=update),
+                        message=question_form(update=update),
                     )
             else:
                 User.notify_admins(
                     update=update,
                     context=context,
-                    message=notification_formatting(update=update),
+                    message=question_form(update=update),
                 )
 
             context.user_data[START_OVER] = True
@@ -241,7 +241,7 @@ def handle_message_or_question(update: Update, context: CallbackContext):
         elif cur_lvl not in STATES_NO_CHAT_SUPPORT:
             pass
             # if TARGET_CHAT_ID:
-            #     context.bot.send_message(chat_id=TARGET_CHAT_ID, text=message_formatting(update))
+            #     context.bot.send_message(chat_id=TARGET_CHAT_ID, text=message_form(update))
             #     context.bot.send_message(
             #         text="Ваше сообщение было направленно в чат поддержки.",
             #         reply_to_message_id=update.message.message_id
@@ -254,7 +254,7 @@ def handle_message_or_question(update: Update, context: CallbackContext):
             #     User.notify_admins(
             #         update=update,
             #         context=context,
-            #         message=notification_formatting(update=update),
+            #         message=notification_form(update=update),
             #     )
 
 
