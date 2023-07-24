@@ -154,6 +154,7 @@ def handle_only_questions(update: Update, context: CallbackContext) -> str:
         new_question, created = Question.add_question(update=update, context=context)
         if created:
             if TARGET_CHAT_ID:
+                print(f"tgbot/handlers/message/handlers.py : {context}")
                 context.bot.send_message(
                     chat_id=TARGET_CHAT_ID, text=question_formatting(update)
                 )
