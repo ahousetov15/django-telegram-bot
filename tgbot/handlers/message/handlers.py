@@ -239,22 +239,23 @@ def handle_message_or_question(update: Update, context: CallbackContext):
                 #     reply_markup=ask_question_or_back_keyboard(),
                 # )
         elif cur_lvl not in STATES_NO_CHAT_SUPPORT:
-            if TARGET_CHAT_ID:
-                context.bot.send_message(chat_id=TARGET_CHAT_ID, text=message_formatting(update))
-                context.bot.send_message(
-                    text="Ваше сообщение было направленно в чат поддержки.",
-                    reply_to_message_id=update.message.message_id
-                )
-                # update.message.reply_text(
-                #     text="Ваше сообщение было направленно в чат поддержки.",
-                #     reply_to_message_id=update.message.message_id,
-                # )
-            else:
-                User.notify_admins(
-                    update=update,
-                    context=context,
-                    message=notification_formatting(update=update),
-                )
+            pass
+            # if TARGET_CHAT_ID:
+            #     context.bot.send_message(chat_id=TARGET_CHAT_ID, text=message_formatting(update))
+            #     context.bot.send_message(
+            #         text="Ваше сообщение было направленно в чат поддержки.",
+            #         reply_to_message_id=update.message.message_id
+            #     )
+            #     # update.message.reply_text(
+            #     #     text="Ваше сообщение было направленно в чат поддержки.",
+            #     #     reply_to_message_id=update.message.message_id,
+            #     # )
+            # else:
+            #     User.notify_admins(
+            #         update=update,
+            #         context=context,
+            #         message=notification_formatting(update=update),
+            #     )
 
 
 @not_for_banned_users

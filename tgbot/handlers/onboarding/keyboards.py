@@ -13,7 +13,7 @@ def make_keyboard_for_start_command(is_admin = False) -> InlineKeyboardMarkup:
         buttons = [
             [
                 InlineKeyboardButton("Вопросы", callback_data=str(QUESTION)),
-                InlineKeyboardButton("Чат поддержки", callback_data=str(SUPPORT_CHAT)),
+                # InlineKeyboardButton("Чат поддержки", callback_data=str(SUPPORT_CHAT)),
             ],
             [
                 InlineKeyboardButton(
