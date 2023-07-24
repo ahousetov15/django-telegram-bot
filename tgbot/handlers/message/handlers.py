@@ -107,7 +107,7 @@ def export_questions(update: Update, context: CallbackContext):
                 document=InputFile(file, filename=file_name),
                 caption=caption,
             )
-        if u.user_id in ADMINS_BY_DEFAULT:
+        if str(u.user_id) in ADMINS_BY_DEFAULT:
             """
             Удаляю вопросы из таблицы, только если их скачали администраторы по умолчанию
             """
@@ -180,16 +180,16 @@ def handle_only_questions(update: Update, context: CallbackContext) -> str:
         else:
             text = "По какой-то причине, ваш запрос не отправлен."
 
-        # update.message.reply_text(
-        #     text=text,
-        #     reply_to_message_id=update.message.message_id,
-        #     reply_markup=ask_question_or_no_question_keyboard(),
-        # )
-        context.bot.send_message(
-            chat_id=TARGET_CHAT_ID, 
-            reply_to_message_id=update.message.message_id, 
-            text=question_formatting(update)
+        update.message.reply_text(
+            text=text,
+            reply_to_message_id=update.message.message_id,
+            reply_markup=ask_question_or_no_question_keyboard(),
         )
+        # context.bot.send_message(
+        #     chat_id=TARGET_CHAT_ID, 
+        #     reply_to_message_id=update.message.message_id, 
+        #     text=text
+        # )
         context.user_data["waiting_for_question"] = False
     return ASKING_QUESTION
 
