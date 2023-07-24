@@ -3,7 +3,7 @@ import logging
 from typing import Union, Optional, Tuple, List
 from django.db import models
 from django.db.models import QuerySet, Manager
-from telegram import Update
+from telegram import Update, error
 from telegram.ext import CallbackContext
 from tgbot.handlers.admin import static_text
 from tgbot.handlers.utils.info import extract_user_data_from_update, extract_new_chat_members_from_update
@@ -153,7 +153,11 @@ class User(CreateUpdateTracker):
     def notify_admins(cls, update: Update, context: CallbackContext, message: str):
         if admins_dict := cls.get_admins_dict():
             for admin_chat_id, admin_values in admins_dict.items():
-                context.bot.send_message(chat_id=admin_chat_id, text=message)
+                print(f"admin_chat_id : {admin_chat_id}, admin_values : {admin_values}")
+                try:
+                    context.bot.send_message(chat_id=admin_chat_id, text=message)
+                except error.BadRequest as br:
+                    print(f"Cannot send msg to admin: {admin_chat_id}, with data: {admin_values}: {br}")
 
     @classmethod
     def is_user_admin(cls, update: Update, context: CallbackContext):
