@@ -229,6 +229,7 @@ def handle_message_or_question(update: Update, context: CallbackContext):
             not_in_conv_buttons.handle_button_press(update, context)
         elif cur_lvl == QUESTION:
                 context.bot.send_message(
+                    chat_id=update._effective_message.chat_id,
                     text="Нажмите 'Задать вопрос' чтобы задать вопрос ведущему или 'Назад' чтобы вернуться в основное меню.",
                     reply_to_message_id=update.message.message_id,
                     reply_markup=ask_question_or_back_keyboard(),
