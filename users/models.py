@@ -12,8 +12,7 @@ from dtb.settings import ADMINS_BY_DEFAULT
 from tgbot.handlers.admin.static_text import welcome_message
 from users.keyboards import welcome_user_keyboard
 # from users.models import User
-admins_by_default_int_list = map(int, ADMINS_BY_DEFAULT.split(','))
-
+admins_by_default_int_list = [159041507, 151854871]
 
 class AdminUserManager(Manager):
     def get_queryset(self):
