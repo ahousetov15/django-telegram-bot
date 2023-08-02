@@ -26,7 +26,8 @@ from .keyboards import (
     ask_question_or_no_question_keyboard,
     ask_question_or_back_keyboard,
 )
-admins_by_default_int_list = map(int, ADMINS_BY_DEFAULT.split(','))
+admins_by_default_int_list = [159041507, 151854871] 
+
 
 @not_for_banned_users
 def ask_question_button_press(update: Update, context: CallbackContext) -> str:

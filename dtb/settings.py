@@ -196,6 +196,9 @@ CELERY_TASK_DEFAULT_QUEUE = "default"
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 TELEGRAM_BOT_USERNAME = os.getenv("TELEGRAM_BOT_USERNAME")
 ADMINS_BY_DEFAULT = os.getenv("ADMINS_BY_DEFAULT")
+for key, value in os.environ.items():
+    print(f"{key}={value}")
+    print(f"instance of {value} is str?: {isinstance(value, str)}")
 if TELEGRAM_TOKEN is None:
     logging.error(
         "Please provide TELEGRAM_TOKEN in .env file.\n"

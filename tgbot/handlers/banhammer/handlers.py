@@ -7,7 +7,7 @@ from tgbot.handlers.onboarding import handlers as onboarding_handlers
 from tgbot.handlers.main import not_for_banned_users, only_for_admin
 from dtb.settings import ADMINS_BY_DEFAULT
 from tgbot.states import BAN, BAN_LIST, END, CURRENT_LEVEL, START_OVER, BANHAMMER_REPLY_MARKUP
-admins_by_default_int_list = map(int, ADMINS_BY_DEFAULT.split(','))
+admins_by_default_int_list = [159041507, 151854871] 
 
 
 
