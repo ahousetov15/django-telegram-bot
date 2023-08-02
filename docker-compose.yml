@@ -13,7 +13,7 @@ services:
     env_file:
       - ./.env
     ports:
-      - "5433:5432"
+      - "5432:5432"
   redis:
     image: redis:alpine
     container_name: dtb_redis
@@ -51,7 +51,7 @@ services:
     restart: always
     command: celery -A dtb worker --loglevel=INFO
     volumes:
-      - .:/code
+      - .:/code/django_telegram_bot
     env_file:
       - ./.env
     depends_on:
@@ -65,7 +65,7 @@ services:
     restart: always
     command: celery -A dtb beat -l info --scheduler django_celery_beat.schedulers.DatabaseScheduler
     volumes:
-      - .:/code
+      - .:/code/django_telegram_bot
     env_file:
       - ./.env
     depends_on:

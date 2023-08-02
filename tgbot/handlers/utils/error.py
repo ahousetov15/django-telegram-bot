@@ -8,21 +8,25 @@ from telegram.ext import CallbackContext
 
 from dtb.settings import TELEGRAM_LOGS_CHAT_ID
 from users.models import User
+from tgbot.handlers.main import not_for_banned_users
 
 
+@not_for_banned_users
 def send_stacktrace_to_tg_chat(update: Update, context: CallbackContext) -> None:
     u = User.get_user(update, context)
 
     logging.error("Exception while handling an update:", exc_info=context.error)
 
-    tb_list = traceback.format_exception(None, context.error, context.error.__traceback__)
-    tb_string = ''.join(tb_list)
+    tb_list = traceback.format_exception(
+        None, context.error, context.error.__traceback__
+    )
+    tb_string = "".join(tb_list)
 
     # Build the message with some markup and additional information about what happened.
     # You might need to add some logic to deal with messages longer than the 4096 character limit.
     message = (
-        f'An exception was raised while handling an update\n'
-        f'<pre>{html.escape(tb_string)}</pre>'
+        f"An exception was raised while handling an update\n"
+        f"<pre>{html.escape(tb_string)}</pre>"
     )
 
     user_message = """

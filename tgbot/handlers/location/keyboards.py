@@ -8,5 +8,5 @@ def send_location_keyboard() -> ReplyKeyboardMarkup:
     # Likely, it will increase click conversion but may decrease UX quality.
     return ReplyKeyboardMarkup(
         [[KeyboardButton(text=SEND_LOCATION, request_location=True)]],
-        resize_keyboard=True
+        resize_keyboard=True,
     )
