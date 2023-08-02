@@ -48,7 +48,7 @@ def handle_callback(update: Update, context: CallbackContext):
     try:
         who_try_ban = update.effective_user
     except Exception as e:
-        print(f"There is no 'effective_user' in update")
+        raise e("There is no 'effective_user' in update")
     if callback_data.startswith("prev_"):
         # Обработка нажатия на кнопку "Previous"
         page = int(callback_data.split("_")[1])

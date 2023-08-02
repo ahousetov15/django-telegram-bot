@@ -99,7 +99,7 @@ ASGI_APPLICATION = "dtb.asgi.application"
 # DATABASES = {
 #     'default': dj_database_url.config(conn_max_age=600, default="sqlite:///db.sqlite3"),
 # }
-# Для DEBUGа
+# # Для DEBUGа
 # DATABASES = {
 #     "default": {
 #         "ENGINE": "django.db.backends.postgresql_psycopg2",
@@ -108,6 +108,20 @@ ASGI_APPLICATION = "dtb.asgi.application"
 #         "PASSWORD": "123",
 #         "HOST": "localhost",
 #         "PORT": 5432,
+#         "OPTIONS": {
+#             "connect_timeout": 10,
+#         },
+#     }
+# }
+# # Для DEBUGа
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql_psycopg2",
+#         "NAME": "postgres",
+#         "USER": "postgres",
+#         "PASSWORD": "postgres",
+#         "HOST": "localhost",
+#         "PORT": 8787,
 #         "OPTIONS": {
 #             "connect_timeout": 10,
 #         },

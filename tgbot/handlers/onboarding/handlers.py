@@ -1,4 +1,9 @@
 import datetime
+
+import pprint
+pp = pprint.PrettyPrinter(indent=4)
+
+
 from users.models import User
 from django.utils import timezone
 from telegram import ParseMode, Update, ReplyKeyboardRemove
@@ -27,17 +32,24 @@ def command_start(update: Update, context: CallbackContext) -> None:
         text += f"\n\n{static_text.short_describtion_for_user_ru}"
     reply_markup_keyboard = make_keyboard_for_start_command(u.is_admin)
 
-    if context.user_data.get(START_OVER):
-        update.callback_query.answer()
-        update.callback_query.edit_message_text(text=text, reply_markup=reply_markup_keyboard)
-    else:
-        context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text="Начинаю работу бота.",
-            reply_markup=ReplyKeyboardRemove(),
-        )
-        update.message.reply_text(text=text, reply_markup=reply_markup_keyboard)
-
+    # print(f"context.user_data : {pp.pformat(context.user_data)}")
+    # if context.user_data.get(START_OVER):
+    #     update.callback_query.answer()
+    #     update.callback_query.edit_message_text(text=text, reply_markup=reply_markup_keyboard)
+    # else:
+    context.bot.send_message(
+        # chat_id=update.effective_chat.id,
+        chat_id=u.user_id,
+        text="Начинаю работу бота.",
+        reply_markup=ReplyKeyboardRemove(),
+    )
+    
+    # update.message.reply_text(text=text, reply_markup=reply_markup_keyboard)
+    context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text=text,
+        reply_markup=reply_markup_keyboard,
+    )
     context.user_data[START_OVER] = False
     return SELECTING_ACTION
 

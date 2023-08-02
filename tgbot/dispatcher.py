@@ -108,39 +108,39 @@ def setup_dispatcher(dp):
         },
     )
 
-    support_chats_conv = ConversationHandler(
-        entry_points=[
-            CallbackQueryHandler(
-                chats_handlers.list_sup_chat, pattern="^" + str(SUPPORT_CHAT) + "$"
-            )
-        ],
-        states={
-            SUPPORT_CHAT: [
-                CallbackQueryHandler(
-                    chats_handlers.list_sup_chat, pattern="^" + str(SUPPORT_CHAT) + "$"
-                )
-            ],
-            SELECT_SUPPORT_CHAT: [
-                CallbackQueryHandler(
-                    chats_handlers.handle_support_chat,
-                    pattern=f"^{SUPPORT_CHAT_AND_NUMBER}",
-                    pass_user_data=True,
-                )
-            ],
-        },
-        fallbacks=[
-            CallbackQueryHandler(
-                chats_handlers.end_support_chat, pattern="^" + str(END) + "$"
-            ),
-            CommandHandler("stop", onboarding_handlers.stop_main_conv),
-        ],
-        map_to_parent={
-            # Возвращаемся к основному диалогу.
-            END: SELECTING_ACTION,
-            # End conversation altogether
-            STOPPING: STOPPING,
-        },
-    )
+    # support_chats_conv = ConversationHandler(
+    #     entry_points=[
+    #         CallbackQueryHandler(
+    #             chats_handlers.list_sup_chat, pattern="^" + str(SUPPORT_CHAT) + "$"
+    #         )
+    #     ],
+    #     states={
+    #         SUPPORT_CHAT: [
+    #             CallbackQueryHandler(
+    #                 chats_handlers.list_sup_chat, pattern="^" + str(SUPPORT_CHAT) + "$"
+    #             )
+    #         ],
+    #         SELECT_SUPPORT_CHAT: [
+    #             CallbackQueryHandler(
+    #                 chats_handlers.handle_support_chat,
+    #                 pattern=f"^{SUPPORT_CHAT_AND_NUMBER}",
+    #                 pass_user_data=True,
+    #             )
+    #         ],
+    #     },
+    #     fallbacks=[
+    #         CallbackQueryHandler(
+    #             chats_handlers.end_support_chat, pattern="^" + str(END) + "$"
+    #         ),
+    #         CommandHandler("stop", onboarding_handlers.stop_main_conv),
+    #     ],
+    #     map_to_parent={
+    #         # Возвращаемся к основному диалогу.
+    #         END: SELECTING_ACTION,
+    #         # End conversation altogether
+    #         STOPPING: STOPPING,
+    #     },
+    # )
 
     ask_question_conv = ConversationHandler(
         entry_points=[
@@ -176,7 +176,7 @@ def setup_dispatcher(dp):
 
     selection_handlers = [
         ask_question_conv,
-        support_chats_conv,
+        # support_chats_conv,
         CallbackQueryHandler(
             message_handlers.export_questions, pattern="^" + str(EXPORT_QUESTIONS) + "$"
         ),
@@ -191,7 +191,7 @@ def setup_dispatcher(dp):
         states={
             SELECTING_ACTION: selection_handlers,
             QUESTION: [ask_question_conv],
-            SUPPORT_CHAT: [support_chats_conv],
+            # SUPPORT_CHAT: [support_chats_conv],
             BAN: [banhammer_conv],
             STOPPING: [CommandHandler("start", onboarding_handlers.command_start)],
         },

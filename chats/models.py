@@ -46,7 +46,7 @@ class Chats(models.Model):
         try:
             support_chat = cls.objects.get(is_support_chat=True)
             return support_chat.chat_id
-        except ObjectDoesNotExist:
+        except Chats.DoesNotExist:
             return None
 
     @classmethod
