@@ -26,7 +26,7 @@ from .keyboards import (
     ask_question_or_no_question_keyboard,
     ask_question_or_back_keyboard,
 )
-
+admins_by_default_int_list = map(int, ADMINS_BY_DEFAULT.split(','))
 
 @not_for_banned_users
 def ask_question_button_press(update: Update, context: CallbackContext) -> str:
@@ -107,7 +107,7 @@ def export_questions(update: Update, context: CallbackContext):
                 document=InputFile(file, filename=file_name),
                 caption=caption,
             )
-        if str(u.user_id) in ADMINS_BY_DEFAULT:
+        if str(u.user_id) in admins_by_default_int_list:
             """
             Удаляю вопросы из таблицы, только если их скачали администраторы по умолчанию
             """

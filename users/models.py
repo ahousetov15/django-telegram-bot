@@ -12,7 +12,7 @@ from dtb.settings import ADMINS_BY_DEFAULT
 from tgbot.handlers.admin.static_text import welcome_message
 from users.keyboards import welcome_user_keyboard
 # from users.models import User
-
+admins_by_default_int_list = map(int, ADMINS_BY_DEFAULT.split(','))
 
 
 class AdminUserManager(Manager):
@@ -71,7 +71,7 @@ class User(CreateUpdateTracker):
         for user in data_list:
             u, created = cls.objects.update_or_create(user_id=user["user_id"], defaults=user)
             if created:
-                if str(user["user_id"]) in ADMINS_BY_DEFAULT:
+                if str(user["user_id"]) in admins_by_default_int_list:
                     u.is_admin = True
                 # Save deep_link to User model
                 if (context is not None and context.args is not None and len(context.args) > 0):
@@ -128,7 +128,7 @@ class User(CreateUpdateTracker):
         data = extract_user_data_from_update(update)
         u, created = cls.objects.update_or_create(user_id=data["user_id"], defaults=data)
         if created:
-            if str(data["user_id"]) in ADMINS_BY_DEFAULT:
+            if str(data["user_id"]) in admins_by_default_int_list:
                 u.is_admin = True
             # Save deep_link to User model
             if (context is not None and context.args is not None and len(context.args) > 0):

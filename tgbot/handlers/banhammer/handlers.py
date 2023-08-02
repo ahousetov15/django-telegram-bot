@@ -7,6 +7,7 @@ from tgbot.handlers.onboarding import handlers as onboarding_handlers
 from tgbot.handlers.main import not_for_banned_users, only_for_admin
 from dtb.settings import ADMINS_BY_DEFAULT
 from tgbot.states import BAN, BAN_LIST, END, CURRENT_LEVEL, START_OVER, BANHAMMER_REPLY_MARKUP
+admins_by_default_int_list = map(int, ADMINS_BY_DEFAULT.split(','))
 
 
 
@@ -76,7 +77,7 @@ def handle_callback(update: Update, context: CallbackContext):
                     text="Не получится забанить самого себя 🙂",
                 )
                 return
-            elif u.user_id in ADMINS_BY_DEFAULT:
+            elif u.user_id in admins_by_default_int_list:
                 context.bot.send_message(
                     chat_id=u.user_id,
                     text="Этого человека банить нельзя. 😎",
