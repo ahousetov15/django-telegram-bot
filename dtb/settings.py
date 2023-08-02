@@ -134,7 +134,7 @@ DATABASES = {
         'NAME': 'postgres',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
-        'HOST': 'db',
+        'HOST': 'dtb',
         'PORT': 5432,
         'OPTIONS': {
             'connect_timeout': 10,
