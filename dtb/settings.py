@@ -141,6 +141,20 @@ ASGI_APPLICATION = "dtb.asgi.application"
 #         }
 #     }
 # }
+# Для dokku
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        'NAME': 'dtb',
+        'USER': 'postgres',
+        'PASSWORD': '9b95cb2993a81e59be7a44a6fb6f0d12',
+        'HOST': 'dokku-postgres-dtb',
+        'PORT': 5432,
+        'OPTIONS': {
+            'connect_timeout': 10,
+        }
+    }
+}
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
