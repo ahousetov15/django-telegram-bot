@@ -19,7 +19,7 @@ jobs:
       name: Deploy to dokku
       uses: idoberko2/dokku-deploy-github-action@v1
       with:
-          ssh-private-key: ${{ secrets.SEC1 }}
+          ssh-private-key: ${{ secrets.BOT_SSH }}
           dokku-host: '90.156.206.212'
           app-name: 'dtb'
           git-push-flags: '--force'
