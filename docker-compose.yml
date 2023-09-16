@@ -14,9 +14,13 @@ services:
       - ./.env
     ports:
       - "5432:5432"
+    networks:
+      - dtb_net
   redis:
     image: redis:alpine
     container_name: dtb_redis
+    networks:
+      - dtb_net
   web:
     build:
       context: .
@@ -32,6 +36,8 @@ services:
       - ./.env
     depends_on:
       - db
+    networks:
+      - dtb_net
   bot:
     build:
       context: .
@@ -43,6 +49,8 @@ services:
       - ./.env
     depends_on:
       - web
+    networks:
+      - dtb_net
   celery:
     build:
       context: .
@@ -57,6 +65,8 @@ services:
     depends_on:
       - redis
       - web
+    networks:
+      - dtb_net
   celery-beat:
     build:
       context: .
@@ -72,6 +82,8 @@ services:
       - redis
       - celery
       - web
+    networks:
+      - dtb_net
 
 volumes:
   postgres_data:
