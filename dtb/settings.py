@@ -147,7 +147,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
         'NAME': 'dtb',
         'USER': 'postgres',
-        'PASSWORD': '9b95cb2993a81e59be7a44a6fb6f0d12',
+        'PASSWORD': '9a6905ebf4bd8c3032536a01f9c18a3d',
         'HOST': 'dokku-postgres-dtb',
         'PORT': 5432,
         'OPTIONS': {
