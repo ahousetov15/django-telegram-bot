@@ -74,7 +74,3 @@ services:
       - web
 volumes:
   postgres_data:
-networks:
-  default:
-    name: dtb
-    external: true
