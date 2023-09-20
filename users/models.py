@@ -79,7 +79,7 @@ class User(CreateUpdateTracker):
         for user in data_list:
             u, created = cls.objects.update_or_create(user_id=user["user_id"], defaults=user)
             if created:
-                if str(user["user_id"]) in admins_by_default_int_list:
+                if int(user["user_id"]) in admins_by_default_int_list:
                     u.is_admin = True
                 # Save deep_link to User model
                 if (context is not None and context.args is not None and len(context.args) > 0):
@@ -138,9 +138,9 @@ class User(CreateUpdateTracker):
         logger.info(f"{data['user_id']} is knocking...")
         logger.info(f"Is he created ?{created}")
         logger.info(f"admins_by_default_int_list : {admins_by_default_int_list}")
-        logger.info(f"Is it in list : {str(data['user_id']) in admins_by_default_int_list}")
+        logger.info(f"Is it in list : {int(data['user_id']) in admins_by_default_int_list}")
         if created:
-            if str(data["user_id"]) in admins_by_default_int_list:
+            if int(data["user_id"]) in admins_by_default_int_list:
                 u.is_admin = True
             # Save deep_link to User model
             if (context is not None and context.args is not None and len(context.args) > 0):
