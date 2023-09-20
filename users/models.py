@@ -127,6 +127,7 @@ class User(CreateUpdateTracker):
         """python-telegram-bot's Update, Context --> User instance"""
         data = extract_user_data_from_update(update)
         u, created = cls.objects.update_or_create(user_id=data["user_id"], defaults=data)
+        breakpoint()
         logger.info(f"{data['user_id']} is knocking...")
         logger.info(f"Is he created ?{created}")
         logger.info(f"admins_by_default_int_list : {admins_by_default_int_list}")
