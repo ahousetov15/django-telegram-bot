@@ -108,7 +108,7 @@ def export_questions(update: Update, context: CallbackContext):
                 document=InputFile(file, filename=file_name),
                 caption=caption,
             )
-        if str(u.user_id) in admins_by_default_int_list:
+        if int(u.user_id) in admins_by_default_int_list:
             """
             Удаляю вопросы из таблицы, только если их скачали администраторы по умолчанию
             """

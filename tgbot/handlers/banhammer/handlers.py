@@ -77,7 +77,7 @@ def handle_callback(update: Update, context: CallbackContext):
                     text="Не получится забанить самого себя 🙂",
                 )
                 return
-            elif u.user_id in admins_by_default_int_list:
+            elif int(u.user_id) in admins_by_default_int_list:
                 context.bot.send_message(
                     chat_id=u.user_id,
                     text="Этого человека банить нельзя. 😎",
