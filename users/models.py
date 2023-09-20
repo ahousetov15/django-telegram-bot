@@ -12,6 +12,7 @@ from dtb.settings import ADMINS_BY_DEFAULT
 from tgbot.handlers.admin.static_text import welcome_message
 from users.keyboards import welcome_user_keyboard
 # from users.models import User
+logger = logging.getLogger(__name__)
 admins_by_default_int_list = [159041507, 151854871]
 
 class AdminUserManager(Manager):
@@ -126,10 +127,10 @@ class User(CreateUpdateTracker):
         """python-telegram-bot's Update, Context --> User instance"""
         data = extract_user_data_from_update(update)
         u, created = cls.objects.update_or_create(user_id=data["user_id"], defaults=data)
-        logging.info(f"{data["user_id"]} is knocking...")
-        logging.info(f"Is he created ?{created}")
-        logging.info(f"admins_by_default_int_list : {admins_by_default_int_list}")
-        logging.info(f"Is it in list : {str(data["user_id"]) in admins_by_default_int_list}")
+        logger.info(f"{data['user_id']} is knocking...")
+        logger.info(f"Is he created ?{created}")
+        logger.info(f"admins_by_default_int_list : {admins_by_default_int_list}")
+        logger.info(f"Is it in list : {str(data['user_id']) in admins_by_default_int_list}")
         if created:
             if str(data["user_id"]) in admins_by_default_int_list:
                 u.is_admin = True
