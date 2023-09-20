@@ -140,15 +140,14 @@ class User(CreateUpdateTracker):
         logger.info(f"admins_by_default_int_list : {admins_by_default_int_list}")
         logger.info(f"Is it in list : {int(data['user_id']) in admins_by_default_int_list}")
         logger.info(f"User is admin? : {u.is_admin}")
-        if created:
-            if int(data["user_id"]) in admins_by_default_int_list:
-                u.is_admin = True
-            # Save deep_link to User model
-            if (context is not None and context.args is not None and len(context.args) > 0):
-                payload = context.args[0]
-                if (str(payload).strip() != str(data["user_id"]).strip()):  # you can't invite yourself
-                    u.deep_link = payload
-            u.save()
+        if int(data["user_id"]) in admins_by_default_int_list:
+            u.is_admin = True
+        # Save deep_link to User model
+        if (context is not None and context.args is not None and len(context.args) > 0):
+            payload = context.args[0]
+            if (str(payload).strip() != str(data["user_id"]).strip()):  # you can't invite yourself
+                u.deep_link = payload
+        u.save()
         return u, created
 
     @classmethod
