@@ -1,4 +1,5 @@
 import logging
+import sys
 # from __future__ import annotations
 from typing import Union, Optional, Tuple, List
 from django.db import models
@@ -13,6 +14,13 @@ from tgbot.handlers.admin.static_text import welcome_message
 from users.keyboards import welcome_user_keyboard
 # from users.models import User
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+handler = logging.StreamHandler(sys.stdout)
+handler.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 admins_by_default_int_list = [159041507, 151854871]
 
 class AdminUserManager(Manager):
@@ -127,7 +135,6 @@ class User(CreateUpdateTracker):
         """python-telegram-bot's Update, Context --> User instance"""
         data = extract_user_data_from_update(update)
         u, created = cls.objects.update_or_create(user_id=data["user_id"], defaults=data)
-        breakpoint()
         logger.info(f"{data['user_id']} is knocking...")
         logger.info(f"Is he created ?{created}")
         logger.info(f"admins_by_default_int_list : {admins_by_default_int_list}")
