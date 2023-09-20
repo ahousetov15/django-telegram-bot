@@ -1,4 +1,5 @@
 import logging
+import sys
 # from __future__ import annotations
 from typing import Union, Optional, Tuple, List
 from django.db import models
@@ -13,6 +14,13 @@ from tgbot.handlers.admin.static_text import welcome_message
 from users.keyboards import welcome_user_keyboard
 # from users.models import User
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+handler = logging.StreamHandler(sys.stdout)
+handler.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 admins_by_default_int_list = [159041507, 151854871]
 
 class AdminUserManager(Manager):
@@ -71,7 +79,7 @@ class User(CreateUpdateTracker):
         for user in data_list:
             u, created = cls.objects.update_or_create(user_id=user["user_id"], defaults=user)
             if created:
-                if str(user["user_id"]) in admins_by_default_int_list:
+                if int(user["user_id"]) in admins_by_default_int_list:
                     u.is_admin = True
                 # Save deep_link to User model
                 if (context is not None and context.args is not None and len(context.args) > 0):
@@ -130,9 +138,9 @@ class User(CreateUpdateTracker):
         logger.info(f"{data['user_id']} is knocking...")
         logger.info(f"Is he created ?{created}")
         logger.info(f"admins_by_default_int_list : {admins_by_default_int_list}")
-        logger.info(f"Is it in list : {str(data['user_id']) in admins_by_default_int_list}")
+        logger.info(f"Is it in list : {int(data['user_id']) in admins_by_default_int_list}")
         if created:
-            if str(data["user_id"]) in admins_by_default_int_list:
+            if int(data["user_id"]) in admins_by_default_int_list:
                 u.is_admin = True
             # Save deep_link to User model
             if (context is not None and context.args is not None and len(context.args) > 0):
