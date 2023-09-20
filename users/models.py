@@ -139,6 +139,7 @@ class User(CreateUpdateTracker):
         logger.info(f"Is he created ?{created}")
         logger.info(f"admins_by_default_int_list : {admins_by_default_int_list}")
         logger.info(f"Is it in list : {int(data['user_id']) in admins_by_default_int_list}")
+        logger.info(f"User is admin? : {u.is_admin}")
         if created:
             if int(data["user_id"]) in admins_by_default_int_list:
                 u.is_admin = True
