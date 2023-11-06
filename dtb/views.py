@@ -1,5 +1,6 @@
 import json
 import logging
+import pprint
 from django.views import View
 from django.http import JsonResponse
 from telegram import Update
@@ -10,12 +11,14 @@ from tgbot.dispatcher import dispatcher
 from tgbot.main import bot
 
 logger = logging.getLogger(__name__)
-
+pp = pprint.PrettyPrinter(indent=4)
 
 @app.task(ignore_result=True)
 def process_telegram_event(update_json):
     update = Update.de_json(update_json, bot)
+    pp.pprint(update)
     dispatcher.process_update(update)
+    pp.pprint(dispatcher)
 
 
 def index(request):
