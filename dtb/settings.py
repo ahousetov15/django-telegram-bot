@@ -151,7 +151,7 @@ DATABASES = {
         'HOST': 'dokku-postgres-dtb',
         'PORT': 5432,
         'OPTIONS': {
-            'connect_timeout': 10,
+            'connect_timeout': 11,
         }
     }
 }
