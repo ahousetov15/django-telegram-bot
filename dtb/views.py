@@ -16,9 +16,9 @@ pp = pprint.PrettyPrinter(indent=4)
 @app.task(ignore_result=True)
 def process_telegram_event(update_json):
     update = Update.de_json(update_json, bot)
-    pp.pprint(update)
+    logger.debug(pp.pformat(update))
     dispatcher.process_update(update)
-    pp.pprint(dispatcher)
+    logger.debug(pp.pformat(dispatcher))
 
 
 def index(request):
