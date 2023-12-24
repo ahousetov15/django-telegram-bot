@@ -12,6 +12,7 @@ from utils.models import CreateUpdateTracker, nb, CreateTracker, GetOrNoneManage
 from dtb.settings import ADMINS_BY_DEFAULT
 from tgbot.handlers.admin.static_text import welcome_message
 from users.keyboards import welcome_user_keyboard
+from const import ADMINS_BY_DEFAULT_INT_LIST
 # from users.models import User
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -21,7 +22,9 @@ handler.setLevel(logging.INFO)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
-admins_by_default_int_list = [159041507, 151854871]
+
+
+# admins_by_default_int_list = [159041507, 151854871]
 
 class AdminUserManager(Manager):
     def get_queryset(self):
@@ -79,7 +82,7 @@ class User(CreateUpdateTracker):
         for user in data_list:
             u, created = cls.objects.update_or_create(user_id=user["user_id"], defaults=user)
             if created:
-                if int(user["user_id"]) in admins_by_default_int_list:
+                if int(user["user_id"]) in ADMINS_BY_DEFAULT_INT_LIST:
                     u.is_admin = True
                 # Save deep_link to User model
                 if (context is not None and context.args is not None and len(context.args) > 0):
@@ -137,10 +140,10 @@ class User(CreateUpdateTracker):
         u, created = cls.objects.update_or_create(user_id=data["user_id"], defaults=data)
         logger.info(f"{data['user_id']} is knocking...")
         logger.info(f"Is he created ?{created}")
-        logger.info(f"admins_by_default_int_list : {admins_by_default_int_list}")
-        logger.info(f"Is it in list : {int(data['user_id']) in admins_by_default_int_list}")
+        logger.info(f"ADMINS_BY_DEFAULT_INT_LIST : {ADMINS_BY_DEFAULT_INT_LIST}")
+        logger.info(f"Is it in list : {int(data['user_id']) in ADMINS_BY_DEFAULT_INT_LIST}")
         logger.info(f"User is admin? : {u.is_admin}")
-        if int(data["user_id"]) in admins_by_default_int_list:
+        if int(data["user_id"]) in ADMINS_BY_DEFAULT_INT_LIST:
             u.is_admin = True
         # Save deep_link to User model
         if (context is not None and context.args is not None and len(context.args) > 0):

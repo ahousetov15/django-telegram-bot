@@ -1,0 +1,2 @@
+# admins_by_default_int_list = [159041507, 151854871]
+ADMINS_BY_DEFAULT_INT_LIST = [159041507, 151854871]
