@@ -128,34 +128,34 @@ ASGI_APPLICATION = "dtb.asgi.application"
 #         },
 #     }
 # }
-# # Для контейнера
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.postgresql_psycopg2",
-#         'NAME': 'postgres',
-#         'USER': 'postgres',
-#         'PASSWORD': 'postgres',
-#         'HOST': 'db',
-#         'PORT': 5432,
-#         'OPTIONS': {
-#             'connect_timeout': 10,
-#         }
-#     }
-# }
-# # Для dokku
+# Для контейнера
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
-        'NAME': 'dtb',
+        'NAME': 'postgres',
         'USER': 'postgres',
-        'PASSWORD': '9a6905ebf4bd8c3032536a01f9c18a3d',
-        'HOST': 'dokku-postgres-dtb',
+        'PASSWORD': 'postgres',
+        'HOST': 'db',
         'PORT': 5432,
         'OPTIONS': {
-            'connect_timeout': 11,
+            'connect_timeout': 10,
         }
     }
 }
+# # # Для dokku
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql_psycopg2",
+#         'NAME': 'dtb',
+#         'USER': 'postgres',
+#         'PASSWORD': '9a6905ebf4bd8c3032536a01f9c18a3d',
+#         'HOST': 'dokku-postgres-dtb',
+#         'PORT': 5432,
+#         'OPTIONS': {
+#             'connect_timeout': 11,
+#         }
+#     }
+# }
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 

@@ -155,6 +155,7 @@ def handle_only_questions(update: Update, context: CallbackContext) -> str:
         new_question, created = Question.add_question(update=update, context=context)
         if created:
             if TARGET_CHAT_ID:
+                # pass
                 print(f"tgbot/handlers/message/handlers.py: context : {context}")
                 print(f"tgbot/handlers/message/handlers.py: TARGET_CHAT_ID : {TARGET_CHAT_ID}")
                 print(f"tgbot/handlers/message/handlers.py: update : {update}")

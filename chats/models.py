@@ -43,11 +43,13 @@ class Chats(models.Model):
 
     @classmethod
     def get_support_chat_id(cls):
-        try:
-            support_chat = cls.objects.get(is_support_chat=True)
-            return support_chat.chat_id
-        except Chats.DoesNotExist:
-            return None
+        # Нам более не нужен функционал чата поддержки, поэтому возвращаем None
+        return None
+        # try:
+        #     support_chat = cls.objects.get(is_support_chat=True)
+        #     return support_chat.chat_id
+        # except Chats.DoesNotExist:
+        #     return None
 
     @classmethod
     def set_chat_as_support(cls, chat_id: int):
